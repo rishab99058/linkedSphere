@@ -1,41 +1,54 @@
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+package com.linksphere.auth_service.entity;
 
-@Entity
-@Table(name = "users")
+import com.linksphere.auth_service.enums.AccountStatus;
+import com.linksphere.auth_service.enums.AuthProvider;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.UUID;
+
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_users_email", columnNames = "email"),
+                @UniqueConstraint(name = "uk_users_phone_number", columnNames = "phone_number")
+        }
+)
 public class UserEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, length = 255)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String firstName;
-
-    @Column
-    private String lastName;
-
-    @Column(length = 10, unique = true)
+    @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
-    @Column(nullable = false)
-    private String profilePictureUrl;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private AuthProvider provider;
 
-    @Column(nullable = false)
-    private boolean isActive;
+    @Column(name = "provider_id")
+    private String providerId;
 
-    @Column(nullable = false)
-    private boolean emailVerified;
+    @Column(name = "email_verified", nullable = false)
+    private Boolean emailVerified;
 
-    @Column(nullable = false)
-    private boolean phoneVerified;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_status", nullable = false, length = 20)
+    private AccountStatus accountStatus;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean deleted;
 }
