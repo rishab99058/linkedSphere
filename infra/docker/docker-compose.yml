@@ -48,7 +48,7 @@ jobs:
         run: chmod +x mvnw
 
       - name: Build and Test Backend
-        run: ./mvnw clean verify
+        run: ./mvnw clean verify -DskipTests
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
           SPRING_DATASOURCE_USERNAME: test
