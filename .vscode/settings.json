@@ -1,4 +1,12 @@
 {
+<<<<<<< HEAD
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "interactive"
+=======
+<<<<<<< HEAD
+    "java.configuration.updateBuildConfiguration": "interactive",
+=======
+>>>>>>> origin/develop
+    "java.compile.nullAnalysis.mode": "automatic"
+>>>>>>> develop
 }
