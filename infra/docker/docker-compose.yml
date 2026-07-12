@@ -1,45 +1,59 @@
-services:
-  postgres:
-    image: postgres:17-alpine
-    container_name: linksphere-postgres
+name: Backend CI
 
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+on:
+  push:
+    branches:
+      - develop
+      - "feature/**"
 
-    ports:
-      - "${POSTGRES_PORT}:5432"
+  pull_request:
+    branches:
+      - develop
 
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+jobs:
+  backend-build:
+    runs-on: ubuntu-latest
 
-    restart: unless-stopped
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    defaults:
+      run:
+        working-directory: backend
 
-  redis:
-    image: redis:8-alpine
-    container_name: linksphere-redis
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    ports:
-      - "${REDIS_PORT}:6379"
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
 
-    volumes:
-      - redis_data:/data
+      - name: Make Maven Wrapper Executable
+        run: chmod +x mvnw
 
-    restart: unless-stopped
+      - name: Build and Test Backend
+        run: ./mvnw clean verify
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
+          SPRING_DATASOURCE_USERNAME: test
+          SPRING_DATASOURCE_PASSWORD: test
 
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  postgres_data:
-  redis_data:
+      - name: Print Surefire Reports on Failure
+        if: failure()
+        run: find . -path "*/target/surefire-reports/*.txt" -exec echo "--- {} ---" \; -exec cat {} \;
