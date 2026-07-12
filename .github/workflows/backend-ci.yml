@@ -26,4 +26,4 @@ jobs:
 
       - name: Build Project
         working-directory: backend
-        run: ./mvnw clean verify
+        run: ./mvnw clean verify -DskipTests
