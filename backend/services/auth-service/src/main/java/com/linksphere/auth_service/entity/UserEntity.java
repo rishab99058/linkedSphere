@@ -5,6 +5,8 @@ import com.linksphere.auth_service.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -51,4 +53,17 @@ public class UserEntity extends BaseEntity {
 
     @Column(name = "is_deleted", nullable = false)
     private Boolean deleted;
+
+    /**
+     * Roles assigned to this user via the user_roles join table.
+     * CascadeType.ALL ensures UserRole rows are inserted/deleted with the user.
+     */
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    @Builder.Default
+    private List<UserRole> userRoles = new ArrayList<>();
 }

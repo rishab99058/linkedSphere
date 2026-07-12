@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
-
+import com.linksphere.common.validation.annotation.StrongPassword;
 @Getter
 @Setter
 public class RegisterRequest {
@@ -14,7 +14,7 @@ public class RegisterRequest {
     @Email(message = "Invalid email")
     private String email;
 
-    @NotBlank(message = "Password is required")
+    @StrongPassword
     private String password;
 
     @NotBlank(message = "Phone number is required")

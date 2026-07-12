@@ -11,8 +11,8 @@
 	<groupId>com.linksphere</groupId>
 	<artifactId>gateway-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>gateway-service</name>
+	<description>Gateway Service</description>
 	<url/>
 	<licenses>
 		<license/>
