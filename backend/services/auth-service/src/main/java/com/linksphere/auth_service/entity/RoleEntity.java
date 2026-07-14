@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.util.UUID;
 
-
 @Entity
 @Table(name = "roles")
 @Getter
