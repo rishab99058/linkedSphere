@@ -1,0 +1,137 @@
+name: Backend CI
+
+# Workflow will trigger whenever code is pushed to the develop branch
+on:
+  push:
+    branches:
+      - develop
+
+# Grant workflow permission to read repository contents
+# and publish Docker images to GitHub Container Registry (GHCR)
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: Build Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      #######################################################################
+      # Checkout Source Code
+      #######################################################################
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      #######################################################################
+      # Setup Java
+      #######################################################################
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+          # Cache Maven dependencies (~/.m2/repository)
+          # This avoids downloading dependencies on every workflow run.
+          cache: maven
+
+      #######################################################################
+      # Verify Java Installation
+      #######################################################################
+      - name: Verify Java
+        run: java --version
+
+      #######################################################################
+      # Verify Backend Folder
+      #######################################################################
+      - name: Verify Backend Directory
+        working-directory: backend
+        run: |
+          pwd
+          ls -la
+
+      #######################################################################
+      # Build Backend
+      #######################################################################
+      - name: Build Backend
+        working-directory: backend
+        run: ./mvnw clean verify
+
+      #######################################################################
+      # Verify Generated JARs
+      #######################################################################
+      - name: Verify Auth Service JAR
+        run: ls -lh backend/services/auth-service/target
+
+      - name: Verify Gateway Service JAR
+        run: ls -lh backend/services/gateway-service/target
+
+      #######################################################################
+      # Verify Docker
+      #######################################################################
+      - name: Verify Docker
+        run: docker --version
+
+      #######################################################################
+      # Login to GitHub Container Registry
+      #######################################################################
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+
+          # Repository owner (recommended over github.actor)
+          username: ${{ github.repository_owner }}
+
+          # GitHub automatically creates this temporary token
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      #######################################################################
+      # Build Auth Service Docker Image
+      #######################################################################
+      - name: Build Auth Service Image
+        run: |
+          docker build \
+            -t ghcr.io/${{ github.repository_owner }}/linksphere/auth-service:${{ github.ref_name }} \
+            -f backend/services/auth-service/Dockerfile \
+            backend
+
+      #######################################################################
+      # Verify Auth Service Image
+      #######################################################################
+      - name: Verify Auth Service Image
+        run: docker image inspect ghcr.io/${{ github.repository_owner }}/linksphere/auth-service:${{ github.ref_name }}
+
+      #######################################################################
+      # Push Auth Service Image
+      #######################################################################
+      - name: Push Auth Service Image
+        run: |
+          docker push \
+            ghcr.io/${{ github.repository_owner }}/linksphere/auth-service:${{ github.ref_name }}
+
+      #######################################################################
+      # Build Gateway Service Docker Image
+      #######################################################################
+      - name: Build Gateway Service Image
+        run: |
+          docker build \
+            -t ghcr.io/${{ github.repository_owner }}/linksphere/gateway-service:${{ github.ref_name }} \
+            -f backend/services/gateway-service/Dockerfile \
+            backend
+
+      #######################################################################
+      # Verify Gateway Service Image
+      #######################################################################
+      - name: Verify Gateway Service Image
+        run: docker image inspect ghcr.io/${{ github.repository_owner }}/linksphere/gateway-service:${{ github.ref_name }}
+
+      #######################################################################
+      # Push Gateway Service Image
+      #######################################################################
+      - name: Push Gateway Service Image
+        run: |
+          docker push \
+            ghcr.io/${{ github.repository_owner }}/linksphere/gateway-service:${{ github.ref_name }}

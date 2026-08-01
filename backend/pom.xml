@@ -38,7 +38,13 @@
     </parent>
 
     <modules>
+        <module>modules/common</module>
+        <module>modules/logging-core</module>
+        <module>modules/testing-core</module>
+        <module>modules/security-core</module>
+        <module>modules/starter-openai</module>
         <module>services/gateway-service</module>
+        <module>services/auth-service</module>
     </modules>
 
     <dependencyManagement>
