@@ -1,0 +1,35 @@
+name: Flutter CI
+
+on:
+    pull_request:
+        branches:
+            - develop
+
+    push:
+        branches:
+            - develop
+
+jobs:
+    analyze-test-build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4 # checkout repository
+
+            - name: Set Up Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  flutter-version: "3.41.4" # set up flutter
+
+            - name: Install Dependencies
+              run: flutter pub get
+
+            - name: Analyze Code
+              run: flutter analyze
+
+            - name: Run Tests
+              run: flutter test
+
+            - name: Build Debug APK
+              run: flutter build apk --debug
