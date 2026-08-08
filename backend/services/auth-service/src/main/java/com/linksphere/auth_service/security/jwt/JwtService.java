@@ -37,9 +37,12 @@ public class JwtService {
     }
 
     public String generateRefreshToken(CustomUserDetails userDetails) {
+        String sessionId = UUID.randomUUID().toString();
         return Jwts
                 .builder()
                 .subject(userDetails.getUsername())
+                .claim("uid", userDetails.getId().toString())
+                .claim("sid", sessionId)
                 .issuedAt(new Date())
                 .issuer(jwtProperties.getIssuer())
                 .expiration(new Date(System.currentTimeMillis() + jwtProperties.getRefreshTokenExpiration()))
@@ -77,6 +80,12 @@ public class JwtService {
         Claims claims = extractAllClaims(token);
         String userId = (String) claims.get("uid");
         return UUID.fromString(userId);
+    }
+
+    public UUID extractSessionId(String token) {
+        Claims claims = extractAllClaims(token);
+        String sessionId = (String) claims.get("sid");
+        return UUID.fromString(sessionId);
     }
 
     public List<String> extractRoles(String token) {

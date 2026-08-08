@@ -27,3 +27,7 @@ jwt:
   access-token-expiration: 900000
   refresh-token-expiration: 604800000
   issuer: "linksphere-auth-service"
+
+redis:
+  host: redis
+  port: 6379
