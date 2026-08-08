@@ -40,7 +40,7 @@ services:
 
 
   auth-service:
-    image: rishab99058/linksphere-auth-service:v0.2.0
+    image: rishab99058/linksphere-auth-service:v0.2.1
     container_name: linksphere-auth-service
     restart: unless-stopped
     ports:
