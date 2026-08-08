@@ -38,10 +38,9 @@ services:
       timeout: 5s
       retries: 5
 
+
   auth-service:
-    build:
-      context: ../../backend
-      dockerfile: services/auth-service/Dockerfile
+    image: rishab99058/linksphere-auth-service:v0.2.0
     container_name: linksphere-auth-service
     restart: unless-stopped
     ports:
@@ -59,24 +58,23 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
-  
+
   gateway-service:
-    build:
-      context: ../../backend
-      dockerfile: services/gateway-service/Dockerfile
+    image: rishab99058/linksphere-gateway-service:v0.2.0
     container_name: linksphere-gateway-service
     restart: unless-stopped
     ports:
       - "8080:8080"
-    depends_on:
-      auth-service:
-        condition: service_started
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8080
       SPRING_CLOUD_GATEWAY_ROUTES_0_ID: auth-service
       SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://auth-service:8001
       SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: Path=/api/v1/auth/**
+      SPRING_CLOUD_GATEWAY_ROUTES_1_ID: auth-service
+      SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://auth-service:8001
+      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0: Path=/api/v1/profile/**
+
 
 
 volumes:
