@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/app/theme.dart';
+import 'routes.dart';
 
 void main() {
   runApp(const LinkedSphereApp());
@@ -13,8 +14,9 @@ class LinkedSphereApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'LinkedSphere',
-      home: const SplashScreen(),
+      home: LinkedSphereApp(),
       theme: AppTheme.lightTheme,
+      routerConfig: router,
     );
   }
 }

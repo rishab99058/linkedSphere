@@ -6,6 +6,10 @@ on:
     branches:
       - develop
 
+  pull_request:
+    branches:
+      - develop
+
 # Grant workflow permission to read repository contents
 # and publish Docker images to GitHub Container Registry (GHCR)
 permissions:
@@ -92,6 +96,7 @@ jobs:
       # Build Auth Service Docker Image
       #######################################################################
       - name: Build Auth Service Image
+        if: github.event_name == 'push'
         run: |
           docker build \
             -t ghcr.io/${{ github.repository_owner }}/linksphere/auth-service:${{ github.ref_name }} \
@@ -102,12 +107,14 @@ jobs:
       # Verify Auth Service Image
       #######################################################################
       - name: Verify Auth Service Image
+        if: github.event_name == 'push'
         run: docker image inspect ghcr.io/${{ github.repository_owner }}/linksphere/auth-service:${{ github.ref_name }}
 
       #######################################################################
       # Push Auth Service Image
       #######################################################################
       - name: Push Auth Service Image
+        if: github.event_name == 'push'
         run: |
           docker push \
             ghcr.io/${{ github.repository_owner }}/linksphere/auth-service:${{ github.ref_name }}
@@ -116,6 +123,7 @@ jobs:
       # Build Gateway Service Docker Image
       #######################################################################
       - name: Build Gateway Service Image
+        if: github.event_name == 'push'
         run: |
           docker build \
             -t ghcr.io/${{ github.repository_owner }}/linksphere/gateway-service:${{ github.ref_name }} \
@@ -126,12 +134,14 @@ jobs:
       # Verify Gateway Service Image
       #######################################################################
       - name: Verify Gateway Service Image
+        if: github.event_name == 'push'
         run: docker image inspect ghcr.io/${{ github.repository_owner }}/linksphere/gateway-service:${{ github.ref_name }}
 
       #######################################################################
       # Push Gateway Service Image
       #######################################################################
       - name: Push Gateway Service Image
+        if: github.event_name == 'push'
         run: |
           docker push \
             ghcr.io/${{ github.repository_owner }}/linksphere/gateway-service:${{ github.ref_name }}
