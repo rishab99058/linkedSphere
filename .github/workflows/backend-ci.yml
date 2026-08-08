@@ -6,6 +6,10 @@ on:
     branches:
       - develop
 
+  pull_request:
+    branches:
+      - develop
+
 # Grant workflow permission to read repository contents
 # and publish Docker images to GitHub Container Registry (GHCR)
 permissions:
