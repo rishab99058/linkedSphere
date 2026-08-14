@@ -133,10 +133,13 @@ public class AuthServiceImpl implements AuthService {
 
                 UUID userId = refreshTokenService.getUserId(sessionId.toString());
                 if (userId == null) {
+                        log.error("Invalid refresh token");
                         throw new BaseException(ErrorCode.ACCESS_DENIED);
                 }
 
                 UserEntity user = userRepository.findById(userId)
+                                .filter(u -> !u.getDeleted())
+                                .filter(u -> u.getAccountStatus() == AccountStatus.ACTIVE)
                                 .orElseThrow(() -> new BaseException(ErrorCode.ACCESS_DENIED));
 
                 CustomUserDetails userDetails = new CustomUserDetails(user);
@@ -156,6 +159,10 @@ public class AuthServiceImpl implements AuthService {
         public void logout(String refreshToken) {
                 // TODO Auto-generated method stub
                 UUID sessionId = jwtService.extractSessionId(refreshToken);
+                if (sessionId == null) {
+                        log.error("Invalid refresh token");
+                        throw new BaseException(ErrorCode.ACCESS_DENIED);
+                }
                 refreshTokenService.deleteSession(sessionId.toString());
         }
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/app/theme.dart';
+import 'package:mobile/features/splash/splash_screen.dart';
 
 class LinkedSphereApp extends StatelessWidget {
   const LinkedSphereApp({super.key});
@@ -8,7 +10,8 @@ class LinkedSphereApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'LinkedSphere',
-      home: const Scaffold(body: Center(child: Text('LinkedSphere'))),
+      theme: AppTheme.lightTheme,
+      home: const SplashScreen(),
     );
   }
 }

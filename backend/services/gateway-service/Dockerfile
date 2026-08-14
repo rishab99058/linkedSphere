@@ -12,6 +12,8 @@ COPY modules/starter-openai/pom.xml modules/starter-openai/
 
 COPY services/auth-service/pom.xml services/auth-service/
 COPY services/gateway-service/pom.xml services/gateway-service/
+COPY services/user-service/pom.xml services/user-service/
+COPY services/discovery-server/pom.xml services/discovery-server/
 
 RUN ./mvnw dependency:go-offline
 
