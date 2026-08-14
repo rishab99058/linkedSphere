@@ -34,12 +34,15 @@ COPY modules/starter-openai/pom.xml modules/starter-openai/
 # Service POMs
 COPY services/auth-service/pom.xml services/auth-service/
 COPY services/gateway-service/pom.xml services/gateway-service/
+COPY services/user-service/pom.xml services/user-service/
+COPY services/discovery-server/pom.xml services/discovery-server/
 
 
 RUN ./mvnw dependency:go-offline
 # Will download all the dependencies of all three from the internet 
 COPY modules/common/src modules/common/src/
 COPY services/auth-service/src services/auth-service/src/
+COPY services/discovery-server/src services/discovery-server/src/
 
 RUN ./mvnw clean package \
     -pl services/auth-service \
