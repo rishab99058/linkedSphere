@@ -14,6 +14,7 @@ services:
 
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
 
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d linksphere"]
@@ -38,45 +39,82 @@ services:
       timeout: 5s
       retries: 5
 
-
-  auth-service:
-    image: rishab99058/linksphere-auth-service:v0.2.1
-    container_name: linksphere-auth-service
+  discovery-server:
+    image: rishab99058/linksphere-discovery-server:v1.0.0
+    container_name: linksphere-discovery-server
     restart: unless-stopped
     ports:
-      - "8001:8001"
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 8761
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/eureka/apps"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  gateway-service:
+    image: rishab99058/linksphere-gateway-service:v1.0.0
+    container_name: linksphere-gateway-service
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
+      discovery-server:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SERVER_PORT: 8001
+      SERVER_PORT: 8080
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+  
+  auth-service:
+    image: rishab99058/linksphere-auth-service:v1.0.0
+    container_name: linksphere-auth-service
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 8082
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/linksphere
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
+      
 
-  gateway-service:
-    image: rishab99058/linksphere-gateway-service:v0.2.0
-    container_name: linksphere-gateway-service
+  
+  user-service:
+    image: rishab99058/linksphere-user-service:v1.0.0
+    container_name: linksphere-user-service
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SERVER_PORT: 8080
-      SPRING_CLOUD_GATEWAY_ROUTES_0_ID: auth-service
-      SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://auth-service:8001
-      SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: Path=/api/v1/auth/**
-      SPRING_CLOUD_GATEWAY_ROUTES_1_ID: auth-service
-      SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://auth-service:8001
-      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0: Path=/api/v1/profile/**
-
-
-
+      SERVER_PORT: 8081
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/linksphere
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+  
 volumes:
   postgres-data:
   redis-data:
+
+
+# docker exec -it linksphere-postgres psql -U postgres -c "CREATE DATABASE linksphere;"

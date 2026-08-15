@@ -145,3 +145,57 @@ jobs:
         run: |
           docker push \
             ghcr.io/${{ github.repository_owner }}/linksphere/gateway-service:${{ github.ref_name }}
+
+      #######################################################################
+      # Build User Service Docker Image
+      #######################################################################
+      - name: Build User Service Image
+        if: github.event_name == 'push'
+        run: |
+          docker build \
+            -t ghcr.io/${{ github.repository_owner }}/linksphere/user-service:${{ github.ref_name }} \
+            -f backend/services/user-service/Dockerfile \
+            backend
+
+      #######################################################################
+      # Verify User Service Image
+      #######################################################################
+      - name: Verify User Service Image
+        if: github.event_name == 'push'
+        run: docker image inspect ghcr.io/${{ github.repository_owner }}/linksphere/user-service:${{ github.ref_name }}
+
+      #######################################################################
+      # Push User Service Image
+      #######################################################################
+      - name: Push User Service Image
+        if: github.event_name == 'push'
+        run: |
+          docker push \
+            ghcr.io/${{ github.repository_owner }}/linksphere/user-service:${{ github.ref_name }}
+
+      #######################################################################
+      # Build Discovery Server Docker Image
+      #######################################################################
+      - name: Build Discovery Server Image
+        if: github.event_name == 'push'
+        run: |
+          docker build \
+            -t ghcr.io/${{ github.repository_owner }}/linksphere/discovery-server:${{ github.ref_name }} \
+            -f backend/services/discovery-server/Dockerfile \
+            backend
+
+      #######################################################################
+      # Verify Discovery Server Image
+      #######################################################################
+      - name: Verify Discovery Server Image
+        if: github.event_name == 'push'
+        run: docker image inspect ghcr.io/${{ github.repository_owner }}/linksphere/discovery-server:${{ github.ref_name }}
+
+      #######################################################################
+      # Push Discovery Server Image
+      #######################################################################
+      - name: Push Discovery Server Image
+        if: github.event_name == 'push'
+        run: |
+          docker push \
+            ghcr.io/${{ github.repository_owner }}/linksphere/discovery-server:${{ github.ref_name }}

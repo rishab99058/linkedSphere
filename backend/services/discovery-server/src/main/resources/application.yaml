@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: discovery-server
+  profiles:
+    active: dev
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
