@@ -62,3 +62,13 @@ COPY --from=builder /opt/app/services/auth-service/target/auth-service-0.0.1-SNA
 EXPOSE 8001
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# docker build --no-cache \
+#   -f services/auth-service/Dockerfile \
+#   -t rishab99058/linksphere/auth-service:v1.0.0 \
+#   .
+
+# docker tag rishab99058/linksphere/auth-service:v1.0.0 \
+#  rishab99058/linksphere-auth-service:v1.0.0
+
+# docker push rishab99058/linksphere-auth-service:v1.0.1

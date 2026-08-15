@@ -1,4 +1,4 @@
-package com.linksphere.auth_service.entity;
+package com.linksphere.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

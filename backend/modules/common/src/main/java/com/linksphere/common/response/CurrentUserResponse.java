@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record CurrentUserResponse(
-        @JsonProperty("authId") UUID authId,
-        String email,
-        String phoneNumber,
-        Set<String> roles) {
+                @JsonProperty("authId") UUID authId,
+                String email,
+                String phoneNumber,
+                Set<String> roles) {
 }

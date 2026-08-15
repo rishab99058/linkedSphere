@@ -11,7 +11,7 @@ public interface UserProfileService {
 
     CreateUserProfileResponse updateMyProfile(UpdateUserProfileRequest request, AuthenticatedUser user);
 
-    CreateUserProfileResponse getMyProfile(AuthenticatedUser user);
+    CreateUserProfileResponse getMyProfile(AuthenticatedUser user, String authHeader);
 
     CreateUserProfileResponse getUserProfileById(String userId);
 

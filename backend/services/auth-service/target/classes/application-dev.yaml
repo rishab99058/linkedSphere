@@ -10,7 +10,7 @@ eureka:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/linksphere_auth
+    url: jdbc:postgresql://localhost:5432/linksphere
     username: postgres
     password: postgres
 

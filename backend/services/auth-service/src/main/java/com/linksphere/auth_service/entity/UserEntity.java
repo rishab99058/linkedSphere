@@ -2,6 +2,8 @@ package com.linksphere.auth_service.entity;
 
 import com.linksphere.auth_service.enums.AccountStatus;
 import com.linksphere.auth_service.enums.AuthProvider;
+import com.linksphere.common.entity.BaseEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,7 +27,7 @@ import org.springframework.security.core.userdetails.UserDetails;
         @UniqueConstraint(name = "uk_users_email", columnNames = "email"),
         @UniqueConstraint(name = "uk_users_phone_number", columnNames = "phone_number")
 })
-public class UserEntity extends BaseEntity implements UserDetails {
+public class UserEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -64,41 +66,4 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private List<UserRole> userRoles = new ArrayList<>();
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.userRoles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRole().getName()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return !this.deleted;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return !this.deleted;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return !this.deleted;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return !this.deleted && this.accountStatus == AccountStatus.ACTIVE && this.emailVerified;
-    }
 }

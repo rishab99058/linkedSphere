@@ -20,6 +20,7 @@ COPY services/user-service/pom.xml services/user-service/pom.xml
 RUN ./mvnw dependency:go-offline
 
 COPY services/discovery-server/src services/discovery-server/src 
+
 RUN ./mvnw clean package \
     -pl services/discovery-server \
     -am \

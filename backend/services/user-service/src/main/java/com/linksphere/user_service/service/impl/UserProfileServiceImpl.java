@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.linksphere.common.enums.ErrorCode;
 import com.linksphere.common.exception.BaseException;
+import com.linksphere.common.response.CurrentUserResponse;
+import com.linksphere.user_service.client.AuthServiceClient;
 import com.linksphere.user_service.dto.request.CreateUserProfileRequest;
 import com.linksphere.user_service.dto.request.UpdateUserProfileRequest;
 import com.linksphere.user_service.dto.response.CreateUserProfileResponse;
@@ -15,6 +17,7 @@ import com.linksphere.user_service.repository.UserProfileRepository;
 import com.linksphere.user_service.security.user.AuthenticatedUser;
 import com.linksphere.user_service.service.UserProfileService;
 
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserProfileServiceImpl implements UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
+    private final AuthServiceClient authServiceClient;
 
     @Override
     public CreateUserProfileResponse createUserProfile(CreateUserProfileRequest request, AuthenticatedUser user) {
@@ -157,7 +161,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public CreateUserProfileResponse getMyProfile(AuthenticatedUser user) {
+    public CreateUserProfileResponse getMyProfile(AuthenticatedUser user, String authHeader) {
         UUID authId = user.getUserId();
 
         if (authId == null) {
@@ -173,6 +177,13 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
+        CurrentUserResponse currentUser;
+        try {
+            currentUser = getCurrentUser();
+        } catch (Exception e) {
+            log.error("Failed to get current user profile", e);
+            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
         return CreateUserProfileResponse.builder()
                 .id(userProfile.get().getId().toString())
                 .authId(userProfile.get().getAuthId().toString())
@@ -184,7 +195,22 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .location(userProfile.get().getLocation())
                 .industry(userProfile.get().getIndustry())
                 .websiteUrl(userProfile.get().getWebsiteUrl())
+                .email(currentUser.email())
+                .phoneNumber(currentUser.phoneNumber())
+                .roles(currentUser.roles())
                 .build();
+    }
+
+    @Retry(name = "getCurrentUser", fallbackMethod = "getCurrentUserFallback")
+    private CurrentUserResponse getCurrentUser() throws Exception {
+        CurrentUserResponse currentUser = null;
+        try {
+            currentUser = authServiceClient.getCurrentUser();
+        } catch (Exception exception) {
+            log.error("Failed to get user profile", exception);
+            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+        return currentUser;
     }
 
     @Override
