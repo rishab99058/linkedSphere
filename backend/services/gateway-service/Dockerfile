@@ -15,11 +15,11 @@ COPY services/gateway-service/pom.xml services/gateway-service/
 COPY services/user-service/pom.xml services/user-service/
 COPY services/discovery-server/pom.xml services/discovery-server/
 
-RUN ./mvnw dependency:go-offline
+RUN --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline
 
 COPY services/gateway-service/src services/gateway-service/src/
 
-RUN ./mvnw clean package \
+RUN --mount=type=cache,target=/root/.m2 ./mvnw clean package \
     -pl services/gateway-service \
     -am \
     -DskipTests

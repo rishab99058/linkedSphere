@@ -38,13 +38,12 @@ COPY services/user-service/pom.xml services/user-service/
 COPY services/discovery-server/pom.xml services/discovery-server/
 
 
-RUN ./mvnw dependency:go-offline
+RUN --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline
 # Will download all the dependencies of all three from the internet 
 COPY modules/common/src modules/common/src/
 COPY services/auth-service/src services/auth-service/src/
-COPY services/discovery-server/src services/discovery-server/src/
 
-RUN ./mvnw clean package \
+RUN --mount=type=cache,target=/root/.m2 ./mvnw clean package \
     -pl services/auth-service \
     -am \
     -DskipTests

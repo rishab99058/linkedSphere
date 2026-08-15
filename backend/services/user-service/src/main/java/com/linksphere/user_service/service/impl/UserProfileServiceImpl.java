@@ -1,5 +1,6 @@
 package com.linksphere.user_service.service.impl;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -59,6 +60,9 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .websiteUrl(request.getWebsiteUrl())
                 .isDeleted(false)
                 .build();
+
+        userProfileEntity.setCreatedAt(Instant.now());
+        userProfileEntity.setUpdatedAt(Instant.now());
 
         UserProfileEntity savedUserProfile = userProfileRepository.save(userProfileEntity);
 
@@ -137,6 +141,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         if (request.getWebsiteUrl() != null) {
             userProfileEntity.setWebsiteUrl(request.getWebsiteUrl());
         }
+
+        userProfileEntity.setUpdatedAt(Instant.now());
 
         UserProfileEntity savedUserProfile = userProfileRepository.save(userProfileEntity);
 
