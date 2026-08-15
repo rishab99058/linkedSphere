@@ -38,13 +38,12 @@ COPY services/user-service/pom.xml services/user-service/
 COPY services/discovery-server/pom.xml services/discovery-server/
 
 
-RUN ./mvnw dependency:go-offline
+RUN --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline
 # Will download all the dependencies of all three from the internet 
 COPY modules/common/src modules/common/src/
 COPY services/auth-service/src services/auth-service/src/
-COPY services/discovery-server/src services/discovery-server/src/
 
-RUN ./mvnw clean package \
+RUN --mount=type=cache,target=/root/.m2 ./mvnw clean package \
     -pl services/auth-service \
     -am \
     -DskipTests
@@ -62,3 +61,13 @@ COPY --from=builder /opt/app/services/auth-service/target/auth-service-0.0.1-SNA
 EXPOSE 8001
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# docker build --no-cache \
+#   -f services/auth-service/Dockerfile \
+#   -t rishab99058/linksphere/auth-service:v1.0.0 \
+#   .
+
+# docker tag rishab99058/linksphere/auth-service:v1.0.0 \
+#  rishab99058/linksphere-auth-service:v1.0.0
+
+# docker push rishab99058/linksphere-auth-service:v1.0.1

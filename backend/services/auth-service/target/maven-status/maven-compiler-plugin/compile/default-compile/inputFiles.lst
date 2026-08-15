@@ -8,7 +8,6 @@
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/response/LoginResponse.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/response/RefreshTokenResponse.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/response/RegisterResponse.java
-/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/entity/BaseEntity.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/entity/RoleEntity.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/entity/UserEntity.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/entity/UserRole.java

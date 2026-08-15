@@ -69,7 +69,7 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
   
   auth-service:
-    image: rishab99058/linksphere-auth-service:v1.0.0
+    image: rishab99058/linksphere-auth-service:v1.0.2
     container_name: linksphere-auth-service
     restart: unless-stopped
     ports:
@@ -94,7 +94,7 @@ services:
 
   
   user-service:
-    image: rishab99058/linksphere-user-service:v1.0.0
+    image: rishab99058/linksphere-user-service:v1.1.2
     container_name: linksphere-user-service
     restart: unless-stopped
     ports:

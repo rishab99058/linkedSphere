@@ -12,7 +12,6 @@ com/linksphere/auth_service/entity/UserEntity$UserEntityBuilder.class
 com/linksphere/auth_service/security/jwt/JwtService.class
 com/linksphere/auth_service/dto/request/LoginRequest$LoginRequestBuilder.class
 com/linksphere/auth_service/dto/request/RefreshTokenRequest.class
-com/linksphere/auth_service/entity/BaseEntity.class
 com/linksphere/auth_service/entity/UserRole$UserRoleBuilder.class
 com/linksphere/auth_service/dto/request/RegisterRequest.class
 com/linksphere/auth_service/dto/request/LoginRequest.class

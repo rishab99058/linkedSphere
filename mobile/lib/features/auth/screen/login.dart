@@ -9,11 +9,7 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          Text(AppConstants.loginTitle),
-          Text(AppConstants.loginSubtitle),
-          TextField(decoration: InputDecoration(labelText: 'Email')),
-          TextField(decoration: InputDecoration(labelText: 'Password')),
-          ElevatedButton(onPressed: () {}, child: Text('Login')),
+          
         ],
       ),
     );

@@ -2,6 +2,7 @@ package com.linksphere.auth_service.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.linksphere.common.entity.BaseEntity;
 
 import java.util.UUID;
 

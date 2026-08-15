@@ -10,10 +10,16 @@ eureka:
 
 spring:
   datasource:
-    url: ${DB_URL}
+    url: jdbc:postgresql://localhost:5432/linksphere
     username: postgres
     password: postgres
-
+  cloud:
+    openfeign:
+      client:
+        config:
+          auth-service:
+            connectTimeout: 2000
+            readTimeout: 3000
   jpa:
     hibernate:
       ddl-auto: update
@@ -25,7 +31,7 @@ spring:
       hibernate:
         format_sql: true
 
-  database-platform: org.hibernate.dialect.PostgreSQLDialect
+  sql:
     init:
       mode: never
 
@@ -34,3 +40,5 @@ jwt:
   access-token-expiration: 900000
   refresh-token-expiration: 604800000
   issuer: "linksphere-auth-service"
+
+

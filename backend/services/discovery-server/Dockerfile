@@ -17,10 +17,11 @@ COPY services/discovery-server/pom.xml services/discovery-server/pom.xml
 COPY services/gateway-service/pom.xml services/gateway-service/pom.xml
 COPY services/user-service/pom.xml services/user-service/pom.xml
 
-RUN ./mvnw dependency:go-offline
+RUN --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline
 
 COPY services/discovery-server/src services/discovery-server/src 
-RUN ./mvnw clean package \
+
+RUN --mount=type=cache,target=/root/.m2 ./mvnw clean package \
     -pl services/discovery-server \
     -am \
     -DskipTests
