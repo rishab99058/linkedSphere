@@ -47,6 +47,7 @@
         <module>services/auth-service</module>
         <module>services/user-service</module>
         <module>services/discovery-server</module>
+        <module>services/notification-service</module>
     </modules>
 
     <dependencyManagement>
