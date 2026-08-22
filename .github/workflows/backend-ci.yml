@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   build:
@@ -61,28 +62,144 @@ jobs:
           echo "Services selected for deployment:"
           printf '%s\n' "$AFFECTED_SERVICES"
 
-      - name: Build Affected Docker Images
-        env:
-          AFFECTED_SERVICES: ${{ steps.affected.outputs.affected_services }}
+      - name: Build Auth Service Image
+        if: contains(steps.affected.outputs.affected_services, 'auth-service')
         run: |
-          while IFS= read -r service; do
+          echo "Building auth-service..."
 
-            [ -z "$service" ] && continue
+          docker build \
+            -f backend/services/auth-service/Dockerfile \
+            -t "linksphere/auth-service:${GITHUB_SHA}" \
+            backend
 
-            echo "Building Docker image for: $service"
+      - name: Build User Service Image
+        if: contains(steps.affected.outputs.affected_services, 'user-service')
+        run: |
+          echo "Building user-service..."
 
-            docker build \
-              -f "backend/services/$service/Dockerfile" \
-              -t "linksphere/$service:${GITHUB_SHA}" \
-              backend
+          docker build \
+            -f backend/services/user-service/Dockerfile \
+            -t "linksphere/user-service:${GITHUB_SHA}" \
+            backend
 
-          done <<< "$AFFECTED_SERVICES"
+      - name: Build Notification Service Image
+        if: contains(steps.affected.outputs.affected_services, 'notification-service')
+        run: |
+          echo "Building notification-service..."
+
+          docker build \
+            -f backend/services/notification-service/Dockerfile \
+            -t "linksphere/notification-service:${GITHUB_SHA}" \
+            backend
+
+      - name: Build Gateway Service Image
+        if: contains(steps.affected.outputs.affected_services, 'gateway-service')
+        run: |
+          echo "Building gateway-service..."
+
+          docker build \
+            -f backend/services/gateway-service/Dockerfile \
+            -t "linksphere/gateway-service:${GITHUB_SHA}" \
+            backend
+
+      - name: Build Discovery Server Image
+        if: contains(steps.affected.outputs.affected_services, 'discovery-server')
+        run: |
+          echo "Building discovery-server..."
+
+          docker build \
+            -f backend/services/discovery-server/Dockerfile \
+            -t "linksphere/discovery-server:${GITHUB_SHA}" \
+            backend
 
       - name: Verify Build Images
-        run: docker images
+        run: |
+          echo "Built Docker images:"
+          docker images "linksphere/*" \
+            --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: projects/172614450127/locations/global/workloadIdentityPools/github-actions/providers/github
           service_account: linksphere-ci@linksphere-backend-dev.iam.gserviceaccount.com
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker asia-south2-docker.pkg.dev --quiet
+
+      - name: Verify Artifact Registry
+        run: |
+          gcloud artifacts repositories list \
+            --project=linksphere-backend-dev \
+            --location=asia-south2
+
+      - name: Tag Auth Service Image
+        if: contains(steps.affected.outputs.affected_services, 'auth-service')
+        run: |
+          docker tag \
+            "linksphere/auth-service:${GITHUB_SHA}" \
+            "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/auth-service:${GITHUB_SHA}"
+
+      - name: Push Auth Service Image
+        if: contains(steps.affected.outputs.affected_services, 'auth-service')
+        run: |
+          echo "Pushing auth-service..."
+
+          docker push "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/auth-service:${GITHUB_SHA}"
+
+      - name: Tag User Service Image
+        if: contains(steps.affected.outputs.affected_services, 'user-service')
+        run: |
+          docker tag \
+            "linksphere/user-service:${GITHUB_SHA}" \
+            "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/user-service:${GITHUB_SHA}"
+
+      - name: Push User Service Image
+        if: contains(steps.affected.outputs.affected_services, 'user-service')
+        run: |
+          echo "Pushing user-service..."
+
+          docker push "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/user-service:${GITHUB_SHA}"
+
+      - name: Tag Notification Service Image
+        if: contains(steps.affected.outputs.affected_services, 'notification-service')
+        run: |
+          docker tag \
+            "linksphere/notification-service:${GITHUB_SHA}" \
+            "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/notification-service:${GITHUB_SHA}"
+
+      - name: Push Notification Service Image
+        if: contains(steps.affected.outputs.affected_services, 'notification-service')
+        run: |
+          echo "Pushing notification-service..."
+
+          docker push "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/notification-service:${GITHUB_SHA}"
+
+      - name: Tag Gateway Service Image
+        if: contains(steps.affected.outputs.affected_services, 'gateway-service')
+        run: |
+          docker tag \
+            "linksphere/gateway-service:${GITHUB_SHA}" \
+            "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/gateway-service:${GITHUB_SHA}"
+
+      - name: Push Gateway Service Image
+        if: contains(steps.affected.outputs.affected_services, 'gateway-service')
+        run: |
+          echo "Pushing gateway-service..."
+
+          docker push "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/gateway-service:${GITHUB_SHA}"
+
+      - name: Tag Discovery Server Image
+        if: contains(steps.affected.outputs.affected_services, 'discovery-server')
+        run: |
+          docker tag \
+            "linksphere/discovery-server:${GITHUB_SHA}" \
+            "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/discovery-server:${GITHUB_SHA}"
+
+      - name: Push Discovery Server Image
+        if: contains(steps.affected.outputs.affected_services, 'discovery-server')
+        run: |
+          echo "Pushing discovery-server..."
+
+          docker push "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/discovery-server:${GITHUB_SHA}"
