@@ -63,7 +63,7 @@ jobs:
           printf '%s\n' "$AFFECTED_SERVICES"
 
       - name: Build Auth Service Image
-        if: github.event_name == 'push' && contains(steps.affected.outputs.affected_services, 'auth-service')
+        if: contains(steps.affected.outputs.affected_services, 'auth-service')
         run: |
           echo "Building auth-service..."
 
@@ -73,7 +73,7 @@ jobs:
             backend
 
       - name: Build User Service Image
-        if: github.event_name == 'push' && contains(steps.affected.outputs.affected_services, 'user-service')
+        if: contains(steps.affected.outputs.affected_services, 'user-service')
         run: |
           echo "Building user-service..."
 
@@ -83,7 +83,7 @@ jobs:
             backend
 
       - name: Build Notification Service Image
-        if: github.event_name == 'push' && contains(steps.affected.outputs.affected_services, 'notification-service')
+        if: contains(steps.affected.outputs.affected_services, 'notification-service')
         run: |
           echo "Building notification-service..."
 
@@ -93,7 +93,7 @@ jobs:
             backend
 
       - name: Build Gateway Service Image
-        if: github.event_name == 'push' && contains(steps.affected.outputs.affected_services, 'gateway-service')
+        if: contains(steps.affected.outputs.affected_services, 'gateway-service')
         run: |
           echo "Building gateway-service..."
 
@@ -103,7 +103,7 @@ jobs:
             backend
 
       - name: Build Discovery Server Image
-        if: github.event_name == 'push' && contains(steps.affected.outputs.affected_services, 'discovery-server')
+        if: contains(steps.affected.outputs.affected_services, 'discovery-server')
         run: |
           echo "Building discovery-server..."
 
