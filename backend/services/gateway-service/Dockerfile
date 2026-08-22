@@ -14,6 +14,7 @@ COPY services/auth-service/pom.xml services/auth-service/
 COPY services/gateway-service/pom.xml services/gateway-service/
 COPY services/user-service/pom.xml services/user-service/
 COPY services/discovery-server/pom.xml services/discovery-server/
+COPY services/notification-service/pom.xml services/notification-service/
 
 RUN --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline
 
