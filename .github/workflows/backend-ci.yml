@@ -77,3 +77,12 @@ jobs:
               backend
 
           done <<< "$AFFECTED_SERVICES"
+
+      - name: Verify Build Images
+        run: docker images
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/172614450127/locations/global/workloadIdentityPools/github-actions/providers/github
+          service_account: linksphere-ci@linksphere-backend-dev.iam.gserviceaccount.com
