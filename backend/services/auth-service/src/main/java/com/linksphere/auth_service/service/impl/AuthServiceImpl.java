@@ -1,17 +1,26 @@
 package com.linksphere.auth_service.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.linksphere.auth_service.dto.request.ForgotPasswordRequest;
 import com.linksphere.auth_service.dto.request.LoginRequest;
 import com.linksphere.auth_service.dto.request.RefreshTokenRequest;
 import com.linksphere.auth_service.dto.request.RegisterRequest;
+import com.linksphere.auth_service.dto.request.ResetPasswordRequest;
+import com.linksphere.auth_service.dto.response.ForgotPasswordRespose;
 import com.linksphere.auth_service.dto.response.LoginResponse;
 import com.linksphere.auth_service.dto.response.RefreshTokenResponse;
 import com.linksphere.auth_service.dto.response.RegisterResponse;
+import com.linksphere.auth_service.dto.response.ResetPasswordResponse;
+import com.linksphere.auth_service.entity.PasswordResetOtpEntity;
 import com.linksphere.auth_service.entity.RoleEntity;
 import com.linksphere.auth_service.entity.UserEntity;
 import com.linksphere.auth_service.entity.UserRole;
 import com.linksphere.auth_service.entity.UserRoleId;
 import com.linksphere.auth_service.enums.AccountStatus;
 import com.linksphere.auth_service.enums.AuthProvider;
+import com.linksphere.auth_service.messaging.KafkaEventPublisher;
+import com.linksphere.auth_service.repository.PasswordResetOtpEntityRepository;
 import com.linksphere.auth_service.repository.RoleRepository;
 import com.linksphere.auth_service.repository.UserRepository;
 import com.linksphere.auth_service.security.jwt.JwtProperties;
@@ -20,10 +29,17 @@ import com.linksphere.auth_service.security.refresh.RefreshTokenService;
 import com.linksphere.auth_service.security.user.CustomUserDetails;
 import com.linksphere.auth_service.service.AuthService;
 import com.linksphere.common.enums.ErrorCode;
+import com.linksphere.common.enums.EventType;
+import com.linksphere.common.events.EventEnvelope;
 import com.linksphere.common.exception.BaseException;
+import com.linksphere.common.request.PasswordResetOtpRequestedEvent;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,6 +62,10 @@ public class AuthServiceImpl implements AuthService {
         private final JwtService jwtService;
         private final JwtProperties jwtProperties;
         private final RefreshTokenService refreshTokenService;
+        private final PasswordResetOtpEntityRepository passwordResetOtpEntityRepository;
+        private static final SecureRandom RANDOM = new SecureRandom();
+        private final ObjectMapper objectMapper;
+        private final KafkaEventPublisher kafkaEventPublisher;
 
         @Override
         public RegisterResponse register(RegisterRequest request) {
@@ -164,6 +184,99 @@ public class AuthServiceImpl implements AuthService {
                         throw new BaseException(ErrorCode.ACCESS_DENIED);
                 }
                 refreshTokenService.deleteSession(sessionId.toString());
+        }
+
+        @Override
+        public ForgotPasswordRespose forgotPassword(ForgotPasswordRequest request) {
+                // TODO Auto-generated method stub
+                String email = request.getEmail();
+                UserEntity user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new BaseException(ErrorCode.RESOURCE_NOT_FOUND));
+
+                if (user.getProvider() != AuthProvider.LOCAL) {
+                        throw new BaseException(ErrorCode.INVALID_CREDENTIALS);
+                }
+
+                passwordResetOtpEntityRepository.deleteByAuthId(user.getId());
+
+                String otp = generateOTP();
+                String hashedOtp = passwordEncoder.encode(otp);
+
+                PasswordResetOtpEntity passwordResetOtpEntity = PasswordResetOtpEntity.builder()
+                                .authId(user.getId())
+                                .otpHash(hashedOtp)
+                                .expiresAt(Instant.now().plusSeconds(600))
+                                .build();
+
+                passwordResetOtpEntityRepository.save(passwordResetOtpEntity);
+
+                // TODO: send email using notification-service
+                PasswordResetOtpRequestedEvent eventPayload = new PasswordResetOtpRequestedEvent(
+                                user.getId(),
+                                user.getEmail(),
+                                otp,
+                                passwordResetOtpEntity.getExpiresAt());
+
+                JsonNode node = objectMapper.valueToTree(eventPayload);
+                EventEnvelope event = new EventEnvelope(
+                                UUID.randomUUID(),
+                                EventType.PASSWORD_RESET_OTP_REQUESTED,
+                                Instant.now(),
+                                node);
+
+                kafkaEventPublisher.publish(
+                                "notification-events",
+                                user.getId().toString(),
+                                event);
+
+                return ForgotPasswordRespose.builder()
+                                .message("OTP sent successfully")
+                                .build();
+
+        }
+
+        private String generateOTP() {
+                int otp = RANDOM.nextInt(999999);
+                return String.format("%06d", otp);
+        }
+
+        @Override
+        public ResetPasswordResponse resetPassword(ResetPasswordRequest request) {
+                // TODO Auto-generated method stub
+                String email = request.getEmail();
+                UserEntity user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new BaseException(ErrorCode.RESOURCE_NOT_FOUND));
+
+                if (user.getProvider() != AuthProvider.LOCAL) {
+                        throw new BaseException(ErrorCode.INVALID_CREDENTIALS);
+                }
+
+                PasswordResetOtpEntity passwordResetOtpEntity = passwordResetOtpEntityRepository
+                                .findTopByAuthIdAndVerifiedFalseAndUsedAtIsNullOrderByCreatedAtDesc(user.getId())
+                                .orElseThrow(() -> new BaseException(ErrorCode.RESOURCE_NOT_FOUND));
+
+                if (!passwordEncoder.matches(
+                                request.getOtp(),
+                                passwordResetOtpEntity.getOtpHash())) {
+
+                        throw new BaseException(ErrorCode.INVALID_CREDENTIALS);
+                }
+
+                if (passwordResetOtpEntity.getExpiresAt().isBefore(Instant.now())) {
+                        throw new BaseException(ErrorCode.RESOURCE_EXPIRED);
+                }
+
+                String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+                user.setPassword(encodedPassword);
+
+                userRepository.save(user);
+
+                passwordResetOtpEntityRepository.deleteByAuthId(user.getId());
+
+                return ResetPasswordResponse.builder()
+                                .message("Password reset successfully")
+                                .build();
         }
 
 }

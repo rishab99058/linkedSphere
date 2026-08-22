@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/colors.dart';
 import 'package:mobile/core/costants.dart';
+import 'package:mobile/features/auth/screen/login.dart';
 import 'package:mobile/features/home/home_screen.dart';
 import 'package:mobile/features/onboarding/widgets/onboardscreen.dart';
 
@@ -23,7 +25,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   void _navigateToHome() {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const HomeScreen(),
+        pageBuilder: (_, __, ___) => const LoginScreen(),
         transitionsBuilder: (_, animation, __, child) {
           return FadeTransition(opacity: animation, child: child);
         },
@@ -139,7 +141,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       height: 56, // Modern comfortable tap target
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
+                          backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shadowColor: Colors.transparent,
