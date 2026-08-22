@@ -61,6 +61,15 @@ jobs:
           echo "Services selected for deployment:"
           printf '%s\n' "$AFFECTED_SERVICES"
 
+      - name: Verify CI Commit
+        run: |
+          echo "GitHub SHA: $GITHUB_SHA"
+          echo "HEAD: $(git rev-parse HEAD)"
+          echo "User service Dockerfile:"
+          grep -n "notification-service" backend/services/user-service/Dockerfile
+          echo "Notification POM:"
+          ls -l backend/services/notification-service/pom.xml
+
       - name: Build Affected Docker Images
         env:
           AFFECTED_SERVICES: ${{ steps.affected.outputs.affected_services }}
