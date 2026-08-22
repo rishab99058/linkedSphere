@@ -10,11 +10,11 @@ HEAD_SHA="${2:-HEAD}"
 changed_files=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
 
 echo
-echo "Changed backend files:"
+echo "Changed files:"
 printf '%s\n' "$changed_files"
 
 echo
-echo "Analyzing changes..."
+echo "Analyzing backend changes..."
 
 services=""
 common_changed=false
@@ -59,7 +59,10 @@ while IFS= read -r file; do
 done <<< "$changed_files"
 
 
+# -------------------------------------------------------------
 # Common module affects these services
+# -------------------------------------------------------------
+
 if [[ "$common_changed" == true ]]; then
 
     for service in \
@@ -85,7 +88,10 @@ if [[ "$common_changed" == true ]]; then
 fi
 
 
+# -------------------------------------------------------------
 # Parent POM affects every backend service
+# -------------------------------------------------------------
+
 if [[ "$parent_changed" == true ]]; then
 
     for service in \
@@ -113,6 +119,10 @@ if [[ "$parent_changed" == true ]]; then
 fi
 
 
+# -------------------------------------------------------------
+# Final result
+# -------------------------------------------------------------
+
 echo
 echo "Common changed: $common_changed"
 echo "Parent POM changed: $parent_changed"
@@ -121,7 +131,27 @@ echo
 echo "Affected services:"
 
 if [[ -n "$services" ]]; then
-    printf '%s\n' "$services" | tr ',' '\n'
+
+    affected_services=$(printf '%s\n' "$services" | tr ',' '\n')
+
+    printf '%s\n' "$affected_services"
+
+    # GitHub Actions output
+    if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+        {
+            echo "affected_services<<EOF"
+            printf '%s\n' "$affected_services"
+            echo "EOF"
+        } >> "$GITHUB_OUTPUT"
+    fi
+
 else
+
     echo "No backend services affected."
+
+    # GitHub Actions output
+    if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+        echo "affected_services=" >> "$GITHUB_OUTPUT"
+    fi
+
 fi
