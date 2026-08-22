@@ -61,23 +61,55 @@ jobs:
           echo "Services selected for deployment:"
           printf '%s\n' "$AFFECTED_SERVICES"
 
-      - name: Build Affected Docker Images
-        env:
-          AFFECTED_SERVICES: ${{ steps.affected.outputs.affected_services }}
+      - name: Build Auth Service Image
+        if: contains(steps.affected.outputs.affected_services, 'auth-service')
         run: |
-          while IFS= read -r service; do
+          echo "Building auth-service..."
 
-            [ -z "$service" ] && continue
+          docker build \
+            -f backend/services/auth-service/Dockerfile \
+            -t "linksphere/auth-service:${GITHUB_SHA}" \
+            backend
 
-            echo "Building Docker image for: $service"
+      - name: Build User Service Image
+        if: contains(steps.affected.outputs.affected_services, 'user-service')
+        run: |
+          echo "Building user-service..."
 
-            docker build \
-              --no-cache \
-              -f "backend/services/$service/Dockerfile" \
-              -t "linksphere/$service:${GITHUB_SHA}" \
-              backend
+          docker build \
+            -f backend/services/user-service/Dockerfile \
+            -t "linksphere/user-service:${GITHUB_SHA}" \
+            backend
 
-          done <<< "$AFFECTED_SERVICES"
+      - name: Build Notification Service Image
+        if: contains(steps.affected.outputs.affected_services, 'notification-service')
+        run: |
+          echo "Building notification-service..."
+
+          docker build \
+            -f backend/services/notification-service/Dockerfile \
+            -t "linksphere/notification-service:${GITHUB_SHA}" \
+            backend
+
+      - name: Build Gateway Service Image
+        if: contains(steps.affected.outputs.affected_services, 'gateway-service')
+        run: |
+          echo "Building gateway-service..."
+
+          docker build \
+            -f backend/services/gateway-service/Dockerfile \
+            -t "linksphere/gateway-service:${GITHUB_SHA}" \
+            backend
+
+      - name: Build Discovery Server Image
+        if: contains(steps.affected.outputs.affected_services, 'discovery-server')
+        run: |
+          echo "Building discovery-server..."
+
+          docker build \
+            -f backend/services/discovery-server/Dockerfile \
+            -t "linksphere/discovery-server:${GITHUB_SHA}" \
+            backend
 
       - name: Verify Build Images
         run: docker images
