@@ -1,4 +1,4 @@
-name: Backend CI
+name: Backend CI/CD
 
 on:
   push:
@@ -13,26 +13,44 @@ permissions:
   contents: read
   id-token: write
 
+env:
+  GCP_PROJECT_ID: linksphere-backend-dev
+  GCP_REGION: asia-south2
+  ARTIFACT_REGISTRY: asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev
+  RUNTIME_SERVICE_ACCOUNT: linksphere-runtime@linksphere-backend-dev.iam.gserviceaccount.com
+
 jobs:
   build:
-    name: Backend Build
+    name: Backend Build & Deploy
     runs-on: ubuntu-latest
 
     steps:
+      # =========================================================
+      # CHECKOUT
+      # =========================================================
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # =========================================================
+      # JAVA
+      # =========================================================
+
       - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: "21"
           distribution: "temurin"
           cache: "maven"
 
       - name: Verify Java
-        run: "java --version"
+        run: java --version
+
+      # =========================================================
+      # MAVEN
+      # =========================================================
 
       - name: Make Maven Wrapper Executable
         working-directory: backend
@@ -40,11 +58,15 @@ jobs:
 
       - name: Verify Maven
         working-directory: backend
-        run: "./mvnw --version"
+        run: ./mvnw --version
 
       - name: Build Backend
         working-directory: backend
-        run: "./mvnw clean verify -DskipTests"
+        run: ./mvnw clean verify -DskipTests
+
+      # =========================================================
+      # DETECT AFFECTED SERVICES
+      # =========================================================
 
       - name: Detect Affected Services
         id: affected
@@ -53,14 +75,24 @@ jobs:
           HEAD_SHA: ${{ github.sha }}
         run: |
           chmod +x scripts/detect-affected-services.sh
-          ./scripts/detect-affected-services.sh "$BASE_SHA" "$HEAD_SHA"
+
+          ./scripts/detect-affected-services.sh \
+            "$BASE_SHA" \
+            "$HEAD_SHA"
 
       - name: Show Affected Services
         env:
           AFFECTED_SERVICES: ${{ steps.affected.outputs.affected_services }}
         run: |
-          echo "Services selected for deployment:"
+          echo "======================================"
+          echo "Affected services:"
+          echo "======================================"
+
           printf '%s\n' "$AFFECTED_SERVICES"
+
+      # =========================================================
+      # DOCKER BUILD
+      # =========================================================
 
       - name: Build Auth Service Image
         if: contains(steps.affected.outputs.affected_services, 'auth-service')
@@ -112,94 +144,224 @@ jobs:
             -t "linksphere/discovery-server:${GITHUB_SHA}" \
             backend
 
+      # =========================================================
+      # VERIFY IMAGES
+      # =========================================================
+
       - name: Verify Build Images
         run: |
+          echo "======================================"
           echo "Built Docker images:"
+          echo "======================================"
+
           docker images "linksphere/*" \
             --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
 
+      # =========================================================
+      # GOOGLE CLOUD AUTHENTICATION
+      # =========================================================
+
       - name: Authenticate to Google Cloud
+        if: github.event_name == 'push'
         uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: projects/172614450127/locations/global/workloadIdentityPools/github-actions/providers/github
           service_account: linksphere-ci@linksphere-backend-dev.iam.gserviceaccount.com
 
+      # =========================================================
+      # ARTIFACT REGISTRY
+      # =========================================================
+
       - name: Configure Docker for Artifact Registry
+        if: github.event_name == 'push'
         run: |
-          gcloud auth configure-docker asia-south2-docker.pkg.dev --quiet
+          gcloud auth configure-docker \
+            asia-south2-docker.pkg.dev \
+            --quiet
 
       - name: Verify Artifact Registry
+        if: github.event_name == 'push'
         run: |
           gcloud artifacts repositories list \
-            --project=linksphere-backend-dev \
-            --location=asia-south2
+            --project="${GCP_PROJECT_ID}" \
+            --location="${GCP_REGION}"
+
+      # =========================================================
+      # AUTH SERVICE
+      # =========================================================
 
       - name: Tag Auth Service Image
-        if: contains(steps.affected.outputs.affected_services, 'auth-service')
+        if: contains(steps.affected.outputs.affected_services, 'auth-service') && github.event_name == 'push'
         run: |
           docker tag \
             "linksphere/auth-service:${GITHUB_SHA}" \
-            "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/auth-service:${GITHUB_SHA}"
+            "${ARTIFACT_REGISTRY}/auth-service:${GITHUB_SHA}"
 
       - name: Push Auth Service Image
-        if: contains(steps.affected.outputs.affected_services, 'auth-service')
+        if: contains(steps.affected.outputs.affected_services, 'auth-service') && github.event_name == 'push'
         run: |
-          echo "Pushing auth-service..."
+          docker push \
+            "${ARTIFACT_REGISTRY}/auth-service:${GITHUB_SHA}"
 
-          docker push "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/auth-service:${GITHUB_SHA}"
+      # =========================================================
+      # USER SERVICE
+      # =========================================================
 
       - name: Tag User Service Image
-        if: contains(steps.affected.outputs.affected_services, 'user-service')
+        if: contains(steps.affected.outputs.affected_services, 'user-service') && github.event_name == 'push'
         run: |
           docker tag \
             "linksphere/user-service:${GITHUB_SHA}" \
-            "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/user-service:${GITHUB_SHA}"
+            "${ARTIFACT_REGISTRY}/user-service:${GITHUB_SHA}"
 
       - name: Push User Service Image
-        if: contains(steps.affected.outputs.affected_services, 'user-service')
+        if: contains(steps.affected.outputs.affected_services, 'user-service') && github.event_name == 'push'
         run: |
-          echo "Pushing user-service..."
+          docker push \
+            "${ARTIFACT_REGISTRY}/user-service:${GITHUB_SHA}"
 
-          docker push "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/user-service:${GITHUB_SHA}"
+      # =========================================================
+      # NOTIFICATION SERVICE
+      # =========================================================
 
       - name: Tag Notification Service Image
-        if: contains(steps.affected.outputs.affected_services, 'notification-service')
+        if: contains(steps.affected.outputs.affected_services, 'notification-service') && github.event_name == 'push'
         run: |
           docker tag \
             "linksphere/notification-service:${GITHUB_SHA}" \
-            "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/notification-service:${GITHUB_SHA}"
+            "${ARTIFACT_REGISTRY}/notification-service:${GITHUB_SHA}"
 
       - name: Push Notification Service Image
-        if: contains(steps.affected.outputs.affected_services, 'notification-service')
+        if: contains(steps.affected.outputs.affected_services, 'notification-service') && github.event_name == 'push'
         run: |
-          echo "Pushing notification-service..."
+          docker push \
+            "${ARTIFACT_REGISTRY}/notification-service:${GITHUB_SHA}"
 
-          docker push "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/notification-service:${GITHUB_SHA}"
+      # =========================================================
+      # GATEWAY SERVICE
+      # =========================================================
 
       - name: Tag Gateway Service Image
-        if: contains(steps.affected.outputs.affected_services, 'gateway-service')
+        if: contains(steps.affected.outputs.affected_services, 'gateway-service') && github.event_name == 'push'
         run: |
           docker tag \
             "linksphere/gateway-service:${GITHUB_SHA}" \
-            "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/gateway-service:${GITHUB_SHA}"
+            "${ARTIFACT_REGISTRY}/gateway-service:${GITHUB_SHA}"
 
       - name: Push Gateway Service Image
-        if: contains(steps.affected.outputs.affected_services, 'gateway-service')
+        if: contains(steps.affected.outputs.affected_services, 'gateway-service') && github.event_name == 'push'
         run: |
-          echo "Pushing gateway-service..."
+          docker push \
+            "${ARTIFACT_REGISTRY}/gateway-service:${GITHUB_SHA}"
 
-          docker push "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/gateway-service:${GITHUB_SHA}"
+      # =========================================================
+      # DISCOVERY SERVER
+      # =========================================================
 
       - name: Tag Discovery Server Image
-        if: contains(steps.affected.outputs.affected_services, 'discovery-server')
+        if: contains(steps.affected.outputs.affected_services, 'discovery-server') && github.event_name == 'push'
         run: |
           docker tag \
             "linksphere/discovery-server:${GITHUB_SHA}" \
-            "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/discovery-server:${GITHUB_SHA}"
+            "${ARTIFACT_REGISTRY}/discovery-server:${GITHUB_SHA}"
 
       - name: Push Discovery Server Image
-        if: contains(steps.affected.outputs.affected_services, 'discovery-server')
+        if: contains(steps.affected.outputs.affected_services, 'discovery-server') && github.event_name == 'push'
         run: |
-          echo "Pushing discovery-server..."
+          docker push \
+            "${ARTIFACT_REGISTRY}/discovery-server:${GITHUB_SHA}"
 
-          docker push "asia-south2-docker.pkg.dev/linksphere-backend-dev/linksphere-dev/discovery-server:${GITHUB_SHA}"
+      # =========================================================
+      # DEPLOY AUTH SERVICE
+      # =========================================================
+
+      - name: Deploy Auth Service
+        if: contains(steps.affected.outputs.affected_services, 'auth-service') && github.event_name == 'push'
+        run: |
+          gcloud run deploy auth-service \
+            --image="${ARTIFACT_REGISTRY}/auth-service:${GITHUB_SHA}" \
+            --region="${GCP_REGION}" \
+            --project="${GCP_PROJECT_ID}" \
+            --platform=managed \
+            --port=8000 \
+            --min=0 \
+            --max=10 \
+            --service-account="${RUNTIME_SERVICE_ACCOUNT}" \
+            --allow-unauthenticated \
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+
+      # =========================================================
+      # DEPLOY USER SERVICE
+      # =========================================================
+
+      - name: Deploy User Service
+        if: contains(steps.affected.outputs.affected_services, 'user-service') && github.event_name == 'push'
+        run: |
+          gcloud run deploy user-service \
+            --image="${ARTIFACT_REGISTRY}/user-service:${GITHUB_SHA}" \
+            --region="${GCP_REGION}" \
+            --project="${GCP_PROJECT_ID}" \
+            --platform=managed \
+            --port=7999 \
+            --min=0 \
+            --max=10 \
+            --service-account="${RUNTIME_SERVICE_ACCOUNT}" \
+            --allow-unauthenticated \
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+
+      # =========================================================
+      # DEPLOY NOTIFICATION SERVICE
+      # =========================================================
+
+      - name: Deploy Notification Service
+        if: contains(steps.affected.outputs.affected_services, 'notification-service') && github.event_name == 'push'
+        run: |
+          gcloud run deploy notification-service \
+            --image="${ARTIFACT_REGISTRY}/notification-service:${GITHUB_SHA}" \
+            --region="${GCP_REGION}" \
+            --project="${GCP_PROJECT_ID}" \
+            --platform=managed \
+            --port=9000 \
+            --min=0 \
+            --max=10 \
+            --service-account="${RUNTIME_SERVICE_ACCOUNT}" \
+            --allow-unauthenticated \
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+
+      # =========================================================
+      # DEPLOY GATEWAY SERVICE
+      # =========================================================
+
+      - name: Deploy Gateway Service
+        if: contains(steps.affected.outputs.affected_services, 'gateway-service') && github.event_name == 'push'
+        run: |
+          gcloud run deploy gateway-service \
+            --image="${ARTIFACT_REGISTRY}/gateway-service:${GITHUB_SHA}" \
+            --region="${GCP_REGION}" \
+            --project="${GCP_PROJECT_ID}" \
+            --platform=managed \
+            --port=8080 \
+            --min=0 \
+            --max=10 \
+            --service-account="${RUNTIME_SERVICE_ACCOUNT}" \
+            --allow-unauthenticated \
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+
+      # =========================================================
+      # DEPLOY DISCOVERY SERVER
+      # =========================================================
+
+      - name: Deploy Discovery Server
+        if: contains(steps.affected.outputs.affected_services, 'discovery-server') && github.event_name == 'push'
+        run: |
+          gcloud run deploy discovery-server \
+            --image="${ARTIFACT_REGISTRY}/discovery-server:${GITHUB_SHA}" \
+            --region="${GCP_REGION}" \
+            --project="${GCP_PROJECT_ID}" \
+            --platform=managed \
+            --port=8761 \
+            --min=1 \
+            --max=2 \
+            --service-account="${RUNTIME_SERVICE_ACCOUNT}" \
+            --allow-unauthenticated \
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"

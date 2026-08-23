@@ -1,12 +1,18 @@
 server:
-  port: 9000
+  port: ${PORT:9000}
   servlet:
     context-path: /notifications
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: https://discovery-server-172614450127.asia-south2.run.app/eureka/
+  instance:
+    hostname: notification-service-4twvjidteq-em.a.run.app
+    prefer-ip-address: false
+    secure-port-enabled: true
+    non-secure-port-enabled: false
+    secure-port: 443
 
 spring:
   datasource:
@@ -41,7 +47,7 @@ spring:
             enable: true
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: notification-service
       auto-offset-reset: earliest
