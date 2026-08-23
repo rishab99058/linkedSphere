@@ -19,7 +19,7 @@ import com.linksphere.auth_service.entity.UserRole;
 import com.linksphere.auth_service.entity.UserRoleId;
 import com.linksphere.auth_service.enums.AccountStatus;
 import com.linksphere.auth_service.enums.AuthProvider;
-import com.linksphere.auth_service.messaging.KafkaEventPublisher;
+import com.linksphere.auth_service.rabbitmq.MailEventPublisher;
 import com.linksphere.auth_service.repository.PasswordResetOtpEntityRepository;
 import com.linksphere.auth_service.repository.RoleRepository;
 import com.linksphere.auth_service.repository.UserRepository;
@@ -39,7 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -65,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
         private final PasswordResetOtpEntityRepository passwordResetOtpEntityRepository;
         private static final SecureRandom RANDOM = new SecureRandom();
         private final ObjectMapper objectMapper;
-        private final KafkaEventPublisher kafkaEventPublisher;
+        private final MailEventPublisher mailEventPublisher;
 
         @Override
         public RegisterResponse register(RegisterRequest request) {
@@ -224,10 +223,7 @@ public class AuthServiceImpl implements AuthService {
                                 Instant.now(),
                                 node);
 
-                kafkaEventPublisher.publish(
-                                "notification-events",
-                                user.getId().toString(),
-                                event);
+                mailEventPublisher.sendPasswordResetOTPMail(event);
 
                 return ForgotPasswordRespose.builder()
                                 .message("OTP sent successfully")
