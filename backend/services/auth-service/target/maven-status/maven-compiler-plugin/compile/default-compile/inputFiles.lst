@@ -1,9 +1,8 @@
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/AuthServiceApplication.java
-/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/config/KafkaProducerConfig.java
-/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/config/KafkaTopicConfig.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/config/SecurityConfig.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/controller/AuthController.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/controller/ProfileController.java
+/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/controller/RabbitMQTestController.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/request/ForgotPasswordRequest.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/request/LoginRequest.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/request/RefreshTokenRequest.java
@@ -21,8 +20,9 @@
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/entity/UserRoleId.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/enums/AccountStatus.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/enums/AuthProvider.java
-/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/messaging/KafkaEventPublisher.java
-/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/messaging/KafkaEventPublisherImpl.java
+/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/rabbitmq/MailEventPublisher.java
+/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/rabbitmq/RabbitMQConfig.java
+/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/rabbitmq/UserEventPublisher.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/repository/PasswordResetOtpEntityRepository.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/repository/RoleRepository.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/repository/UserRepository.java

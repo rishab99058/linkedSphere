@@ -14,18 +14,15 @@ import com.linkedsphere.notification_service.entity.NotificationDeliveryEntity;
 @Repository
 public interface NotificationDelivaryRepository extends JpaRepository<NotificationDeliveryEntity, UUID> {
 
-    Optional<NotificationDeliveryEntity> findByNotificationIdAndChannel(
-            UUID notificationId,
-            NotificationChannel channel
-    );
+        Optional<NotificationDeliveryEntity> findByNotificationIdAndChannel(
+                        UUID notificationId,
+                        NotificationChannel channel);
 
-    boolean existsByNotificationIdAndChannel(
-            UUID notificationId,
-            NotificationChannel channel
-    );
+        boolean existsByNotificationIdAndChannel(
+                        UUID notificationId,
+                        NotificationChannel channel);
 
-    long countByNotificationIdAndStatus(
-            UUID notificationId,
-            NotificationDeliveryStatus status
-    );
+        long countByNotificationIdAndStatus(
+                        UUID notificationId,
+                        NotificationDeliveryStatus status);
 }
