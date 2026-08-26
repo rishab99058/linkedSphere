@@ -96,7 +96,6 @@ jobs:
       # =========================================================
 
       - name: Login to GHCR
-        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -224,3 +223,21 @@ jobs:
             docker image inspect "$image" \
               --format '{{.Os}}/{{.Architecture}}'
           done
+
+      # =========================================================
+      # PUSH AUTH SERVICE TO GHCR
+      # =========================================================
+
+      - name: Push Auth Service Image to GHCR
+        if: contains(steps.affected.outputs.affected_services, 'auth-service') && github.event_name == 'push'
+        run: |
+          echo "======================================"
+          echo "Pushing auth-service to GHCR"
+          echo "======================================"
+
+          docker tag \
+            "linksphere/auth-service:${GITHUB_SHA}" \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-auth-service:${GITHUB_SHA}"
+
+          docker push \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-auth-service:${GITHUB_SHA}"
