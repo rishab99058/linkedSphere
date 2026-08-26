@@ -225,19 +225,19 @@ jobs:
           done
 
       # =========================================================
-      # PUSH AUTH SERVICE TO GHCR
+      # PUSH DISCOVERY SERVER TO GHCR
       # =========================================================
 
-      - name: Push Auth Service Image to GHCR
-        if: contains(steps.affected.outputs.affected_services, 'auth-service')
+      - name: Push Discovery Server Image to GHCR
+        if: contains(steps.affected.outputs.affected_services, 'discovery-server')
         run: |
           echo "======================================"
-          echo "Pushing auth-service to GHCR"
+          echo "Pushing discovery-server to GHCR"
           echo "======================================"
 
           docker tag \
-            "linksphere/auth-service:${GITHUB_SHA}" \
-            "ghcr.io/${{ github.repository_owner }}/linksphere-auth-service:${GITHUB_SHA}"
+            "linksphere/discovery-server:${GITHUB_SHA}" \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-discovery-server:${GITHUB_SHA}"
 
           docker push \
-            "ghcr.io/${{ github.repository_owner }}/linksphere-auth-service:${GITHUB_SHA}"
+            "ghcr.io/${{ github.repository_owner }}/linksphere-discovery-server:${GITHUB_SHA}"
