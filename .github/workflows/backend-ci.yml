@@ -91,57 +91,105 @@ jobs:
           printf '%s\n' "$AFFECTED_SERVICES"
 
       # =========================================================
-      # DOCKER BUILD
+      # DOCKER / BUILDX
+      # =========================================================
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # =========================================================
+      # AUTH SERVICE
       # =========================================================
 
       - name: Build Auth Service Image
         if: contains(steps.affected.outputs.affected_services, 'auth-service')
         run: |
-          echo "Building auth-service..."
+          echo "======================================"
+          echo "Building auth-service"
+          echo "Platform: linux/arm64"
+          echo "======================================"
 
-          docker build \
+          docker buildx build \
+            --platform linux/arm64 \
             -f backend/services/auth-service/Dockerfile \
             -t "linksphere/auth-service:${GITHUB_SHA}" \
+            --load \
             backend
+
+      # =========================================================
+      # USER SERVICE
+      # =========================================================
 
       - name: Build User Service Image
         if: contains(steps.affected.outputs.affected_services, 'user-service')
         run: |
-          echo "Building user-service..."
+          echo "======================================"
+          echo "Building user-service"
+          echo "Platform: linux/arm64"
+          echo "======================================"
 
-          docker build \
+          docker buildx build \
+            --platform linux/arm64 \
             -f backend/services/user-service/Dockerfile \
             -t "linksphere/user-service:${GITHUB_SHA}" \
+            --load \
             backend
+
+      # =========================================================
+      # NOTIFICATION SERVICE
+      # =========================================================
 
       - name: Build Notification Service Image
         if: contains(steps.affected.outputs.affected_services, 'notification-service')
         run: |
-          echo "Building notification-service..."
+          echo "======================================"
+          echo "Building notification-service"
+          echo "Platform: linux/arm64"
+          echo "======================================"
 
-          docker build \
+          docker buildx build \
+            --platform linux/arm64 \
             -f backend/services/notification-service/Dockerfile \
             -t "linksphere/notification-service:${GITHUB_SHA}" \
+            --load \
             backend
+
+      # =========================================================
+      # GATEWAY SERVICE
+      # =========================================================
 
       - name: Build Gateway Service Image
         if: contains(steps.affected.outputs.affected_services, 'gateway-service')
         run: |
-          echo "Building gateway-service..."
+          echo "======================================"
+          echo "Building gateway-service"
+          echo "Platform: linux/arm64"
+          echo "======================================"
 
-          docker build \
+          docker buildx build \
+            --platform linux/arm64 \
             -f backend/services/gateway-service/Dockerfile \
             -t "linksphere/gateway-service:${GITHUB_SHA}" \
+            --load \
             backend
+
+      # =========================================================
+      # DISCOVERY SERVER
+      # =========================================================
 
       - name: Build Discovery Server Image
         if: contains(steps.affected.outputs.affected_services, 'discovery-server')
         run: |
-          echo "Building discovery-server..."
+          echo "======================================"
+          echo "Building discovery-server"
+          echo "Platform: linux/arm64"
+          echo "======================================"
 
-          docker build \
+          docker buildx build \
+            --platform linux/arm64 \
             -f backend/services/discovery-server/Dockerfile \
             -t "linksphere/discovery-server:${GITHUB_SHA}" \
+            --load \
             backend
 
       # =========================================================
@@ -156,6 +204,20 @@ jobs:
 
           docker images "linksphere/*" \
             --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
+
+          echo ""
+          echo "======================================"
+          echo "Image architectures:"
+          echo "======================================"
+
+          for image in $(docker images "linksphere/*" \
+            --format "{{.Repository}}:{{.Tag}}"); do
+
+            echo -n "$image -> "
+
+            docker image inspect "$image" \
+              --format '{{.Os}}/{{.Architecture}}'
+          done
 
       # =========================================================
       # GOOGLE CLOUD AUTHENTICATION

@@ -46,9 +46,11 @@ spring:
           starttls:
             enable: true
 
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    consumer:
-      group-id: notification-service
-      auto-offset-reset: earliest
-      enable-auto-commit: false
+  rabbitmq:
+    host: warthog.lmq.cloudamqp.com
+    port: 5671
+    username: bepmlbwp
+    virtual-host: bepmlbwp
+    password: SRzPZy6UL8ZtZLfONaGd9rjj4K64PYHl
+    ssl:
+      enabled: true

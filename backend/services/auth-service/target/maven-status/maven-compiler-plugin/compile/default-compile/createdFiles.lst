@@ -5,10 +5,12 @@ com/linksphere/auth_service/entity/PasswordResetOtpEntity.class
 com/linksphere/auth_service/entity/UserRoleId.class
 com/linksphere/auth_service/security/jwt/JwtAuthenticationFilter.class
 com/linksphere/auth_service/service/AuthService.class
+com/linksphere/auth_service/controller/RabbitMQTestController.class
 com/linksphere/auth_service/dto/response/RefreshTokenResponse.class
 com/linksphere/auth_service/enums/AccountStatus.class
+com/linksphere/auth_service/rabbitmq/RabbitMQConfig.class
 com/linksphere/auth_service/entity/UserEntity$UserEntityBuilder.class
-com/linksphere/auth_service/config/KafkaProducerConfig.class
+com/linksphere/auth_service/rabbitmq/MailEventPublisher.class
 com/linksphere/auth_service/dto/request/RegisterRequest.class
 com/linksphere/auth_service/security/refresh/RefreshTokenService.class
 com/linksphere/auth_service/security/user/CustomUserDetailsService.class
@@ -27,7 +29,6 @@ com/linksphere/auth_service/repository/PasswordResetOtpEntityRepository.class
 com/linksphere/auth_service/entity/UserRole.class
 com/linksphere/auth_service/controller/AuthController.class
 com/linksphere/auth_service/enums/AuthProvider.class
-com/linksphere/auth_service/messaging/KafkaEventPublisherImpl.class
 com/linksphere/auth_service/security/jwt/JwtService.class
 com/linksphere/auth_service/dto/response/ResetPasswordResponse$ResetPasswordResponseBuilder.class
 com/linksphere/auth_service/dto/response/ResetPasswordResponse.class
@@ -36,11 +37,10 @@ com/linksphere/auth_service/dto/request/RefreshTokenRequest.class
 com/linksphere/auth_service/entity/UserRole$UserRoleBuilder.class
 com/linksphere/auth_service/dto/request/LoginRequest.class
 com/linksphere/auth_service/dto/response/RegisterResponse$RegisterResponseBuilder.class
-com/linksphere/auth_service/messaging/KafkaEventPublisher.class
 com/linksphere/auth_service/dto/response/RefreshTokenResponse$RefreshTokenResponseBuilder.class
-com/linksphere/auth_service/config/KafkaTopicConfig.class
 com/linksphere/auth_service/dto/response/LoginResponse.class
 com/linksphere/auth_service/repository/RoleRepository.class
+com/linksphere/auth_service/rabbitmq/UserEventPublisher.class
 com/linksphere/auth_service/AuthServiceApplication.class
 com/linksphere/auth_service/entity/RoleEntity$RoleEntityBuilder.class
 com/linksphere/auth_service/config/SecurityConfig.class
