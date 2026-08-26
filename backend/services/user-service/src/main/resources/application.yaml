@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: user-service
+resilience4j:
+  retry:
+    instances:
+      auth-service:
+        max-attempts: 3
+        wait-duration: 1s

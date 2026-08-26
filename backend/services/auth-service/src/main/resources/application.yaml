@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: auth-service
+
+  profiles:
+    active: dev
+
+logging:
+  level:
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
