@@ -241,3 +241,75 @@ jobs:
 
           docker push \
             "ghcr.io/${{ github.repository_owner }}/linksphere-discovery-server:${GITHUB_SHA}"
+
+      # =========================================================
+      # PUSH API GATEWAY TO GHCR
+      # =========================================================
+
+      - name: Push API Gateway Image to GHCR
+        if: contains(steps.affected.outputs.affected_services, 'gateway-service')
+        run: |
+          echo "======================================"
+          echo "Pushing gateway-service to GHCR"
+          echo "======================================"
+
+          docker tag \
+            "linksphere/gateway-service:${GITHUB_SHA}" \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-gateway-service:${GITHUB_SHA}"
+
+          docker push \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-gateway-service:${GITHUB_SHA}"
+
+      # =========================================================
+      # PUSH AUTH SERVICE TO GHCR
+      # =========================================================
+
+      - name: Push Auth Service Image to GHCR
+        if: contains(steps.affected.outputs.affected_services, 'auth-service')
+        run: |
+          echo "======================================"
+          echo "Pushing auth-service to GHCR"
+          echo "======================================"
+
+          docker tag \
+            "linksphere/auth-service:${GITHUB_SHA}" \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-auth-service:${GITHUB_SHA}"
+
+          docker push \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-auth-service:${GITHUB_SHA}"
+
+      # =========================================================
+      # PUSH USER SERVICE TO GHCR
+      # =========================================================
+
+      - name: Push User Service Image to GHCR
+        if: contains(steps.affected.outputs.affected_services, 'user-service')
+        run: |
+          echo "======================================"
+          echo "Pushing user-service to GHCR"
+          echo "======================================"
+
+          docker tag \
+            "linksphere/user-service:${GITHUB_SHA}" \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-user-service:${GITHUB_SHA}"
+
+          docker push \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-user-service:${GITHUB_SHA}"
+
+      # =========================================================
+      # PUSH NOTIFICATION SERVICE TO GHCR
+      # =========================================================
+
+      - name: Push Notification Service Image to GHCR
+        if: contains(steps.affected.outputs.affected_services, 'notification-service')
+        run: |
+          echo "======================================"
+          echo "Pushing notification-service to GHCR"
+          echo "======================================"
+
+          docker tag \
+            "linksphere/notification-service:${GITHUB_SHA}" \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-notification-service:${GITHUB_SHA}"
+
+          docker push \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-notification-service:${GITHUB_SHA}"
