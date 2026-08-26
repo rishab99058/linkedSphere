@@ -30,3 +30,16 @@ export async function getUserProfile() {
     "/auth/api/v1/profile/me",
   );
 }
+
+export interface LogoutRequest {
+  refreshToken: string;
+}
+
+export async function logoutUser(
+  request: LogoutRequest,
+) {
+  return apiClient.post(
+    "/auth/api/v1/auth/logout",
+    request,
+  );
+}

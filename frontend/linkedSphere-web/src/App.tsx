@@ -5,14 +5,12 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
+import ProtectedRoute from "./routes/protected-route";
 
 import LoginPage from "./features/auth/pages/login-page";
 import RegisterPage from "./features/auth/pages/register-page";
 import HomePage from "./features/feed/pages/home-page";
 
-function ProtectedRoute({ children }: { children: React.ReactElement }) {
-  return children;
-}
 
 function App() {
   return (
@@ -33,14 +31,12 @@ function App() {
           element={<RegisterPage />}
         />
 
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
-        />
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/home"
+            element={<HomePage />}
+          />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

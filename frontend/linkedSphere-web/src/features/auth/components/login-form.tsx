@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { z } from "zod";
 import { Eye, EyeOff } from "lucide-react";
-import { setAccessToken, removeAccessToken } from "@/lib/auth-storage";
+import { setAccessToken, removeAccessToken, setRefreshToken } from "@/lib/auth-storage";
 import { loginUser, getUserProfile } from "../api/auth-api";
 import { useNavigate } from "react-router-dom";
+
+
 
 
 const loginSchema = z.object({
@@ -108,6 +110,9 @@ async function handleSubmit(
     const accessToken =
       loginResponse.data?.accessToken;
 
+    const refreshToken =
+      loginResponse.data?.refreshToken;
+
     if (!accessToken) {
       setApiError(
         "Login succeeded but access token was not returned.",
@@ -118,9 +123,9 @@ async function handleSubmit(
     //Store token
     setAccessToken(accessToken);
 
-    console.log(
-      "Access token stored successfully.",
-    );
+    if (refreshToken) {
+      setRefreshToken(refreshToken);
+    }
 
     //Call protected API
     try {

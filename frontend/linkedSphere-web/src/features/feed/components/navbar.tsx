@@ -2,18 +2,31 @@ import {Bell, Home, Menu, Network, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { removeAccessToken } from "@/lib/auth-storage";
+import { clearAuthStorage, getRefreshToken, removeAccessToken } from "@/lib/auth-storage";
+import { logoutUser } from "@/features/auth/api/auth-api";
 
 function Navbar() {
   const navigate = useNavigate();
 
-  function handleLogout() {
-    removeAccessToken();
+  async function handleLogout() {
+    const refreshToken = getRefreshToken();
 
-    navigate("/auth/login", {
-      replace: true,
-    });
-  }
+    try {
+        if (refreshToken) {
+        await logoutUser({
+            refreshToken,
+        });
+        }
+    } catch (error) {
+        console.error("Logout API failed:", error);
+    } finally {
+        clearAuthStorage();
+
+        navigate("/auth/login", {
+        replace: true,
+        });
+    }
+ }
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white">
