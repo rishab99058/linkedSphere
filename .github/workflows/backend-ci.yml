@@ -229,7 +229,7 @@ jobs:
       # =========================================================
 
       - name: Push Auth Service Image to GHCR
-        if: contains(steps.affected.outputs.affected_services, 'auth-service') && github.event_name == 'push'
+        if: contains(steps.affected.outputs.affected_services, 'auth-service')
         run: |
           echo "======================================"
           echo "Pushing auth-service to GHCR"
