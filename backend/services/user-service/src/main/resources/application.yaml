@@ -1,6 +1,10 @@
 spring:
   application:
     name: user-service
+
+  profiles:
+    active: dev
+
 resilience4j:
   retry:
     instances:

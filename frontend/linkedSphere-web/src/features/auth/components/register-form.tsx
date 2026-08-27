@@ -4,6 +4,10 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
+
+import { registerUser } from "../api/auth-api";
 
 const registerSchema = z
   .object({
@@ -29,6 +33,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 type RegisterFormErrors = Partial<Record<keyof RegisterFormValues, string>>;
 
 function RegisterForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<RegisterFormValues>({
     email: "",
     phoneNumber: "",
@@ -36,6 +41,11 @@ function RegisterForm() {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState<RegisterFormErrors>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   function handleChange(field: keyof RegisterFormValues, value: string) {
     setFormData((previousData) => ({
@@ -49,8 +59,11 @@ function RegisterForm() {
     }));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    setApiError("");
+    setIsSuccess(false);
 
     const result = registerSchema.safeParse(formData);
 
@@ -58,7 +71,9 @@ function RegisterForm() {
       const fieldErrors = result.error.flatten().fieldErrors;
       const nextErrors: RegisterFormErrors = {};
 
-      (Object.keys(formData) as Array<keyof RegisterFormValues>).forEach((field) => {
+      (
+        Object.keys(formData) as Array<keyof RegisterFormValues>
+      ).forEach((field) => {
         const message = fieldErrors[field]?.[0];
 
         if (message) {
@@ -70,8 +85,40 @@ function RegisterForm() {
       return;
     }
 
+    // Validation successful
     setErrors({});
-    console.log("Registration validation successful", result.data);
+
+  
+    const payload = {
+      email: result.data.email,
+      password: result.data.password,
+      phoneNumber: result.data.phoneNumber,
+    };
+
+    console.log("Payload going to backend:", payload);
+
+    try {
+      setIsLoading(true);
+
+      const response = await registerUser(payload);
+
+      console.log("Registration status:", response.status);
+      console.log("Registration response:", response.data);
+
+      setIsSuccess(true);
+      setTimeout(() => {
+    navigate("/auth/login");
+  }, 2000);
+
+    } catch (error) {
+      console.error("Registration failed:", error);
+
+      setApiError(
+        "Unable to create your account. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -113,33 +160,126 @@ function RegisterForm() {
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
 
-        <Input
-          id="password"
-          type="password"
-          value={formData.password}
-          onChange={(event) => handleChange("password", event.target.value)}
-          aria-invalid={Boolean(errors.password)}
-        />
-        {errors.password ? <p className="text-sm text-red-500">{errors.password}</p> : null}
-      </div>
+        <div className="relative">
+          <Input
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter your password"
+            autoComplete="new-password"
+            value={formData.password}
+            onChange={(event) =>
+              handleChange("password", event.target.value)
+            }
+            aria-invalid={Boolean(errors.password)}
+            className="pr-10"
+          />
 
-      <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirm Password</Label>
+          {formData.password.length > 0 && (
+            <button
+              type="button"
+              onClick={() =>
+                setShowPassword((previous) => !previous)
+              }
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+              aria-label={
+                showPassword ? "Hide password" : "Show password"
+              }
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          )}
+        </div>
 
-        <Input
-          id="confirmPassword"
-          type="password"
-          value={formData.confirmPassword}
-          onChange={(event) => handleChange("confirmPassword", event.target.value)}
-          aria-invalid={Boolean(errors.confirmPassword)}
-        />
-        {errors.confirmPassword ? (
-          <p className="text-sm text-red-500">{errors.confirmPassword}</p>
+        {errors.password ? (
+          <p className="text-sm text-red-500">
+            {errors.password}
+          </p>
         ) : null}
       </div>
 
-      <Button type="submit" className="w-full">
-        Create Account
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword">
+          Confirm Password
+        </Label>
+
+        <div className="relative">
+          <Input
+            id="confirmPassword"
+            name="confirmPassword"
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Confirm your password"
+            autoComplete="new-password"
+            value={formData.confirmPassword}
+            onChange={(event) =>
+              handleChange("confirmPassword", event.target.value)
+            }
+            aria-invalid={Boolean(errors.confirmPassword)}
+            className="pr-10"
+          />
+
+          {formData.confirmPassword.length > 0 && (
+            <button
+              type="button"
+              onClick={() =>
+                setShowConfirmPassword((previous) => !previous)
+              }
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+              aria-label={
+                showConfirmPassword
+                  ? "Hide confirm password"
+                  : "Show confirm password"
+              }
+            >
+              {showConfirmPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          )}
+        </div>
+
+        {errors.confirmPassword ? (
+          <p className="text-sm text-red-500">
+            {errors.confirmPassword}
+          </p>
+        ) : null}
+      </div>
+
+
+      {apiError ? (
+        <p className="text-sm text-red-500">
+          {apiError}
+        </p>
+      ) : null}
+
+      {isSuccess ? (
+        <div className="flex flex-col items-center gap-2 py-3 text-center animate-in fade-in zoom-in duration-500">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+            <span className="text-xl text-green-600">✓</span>
+          </div>
+
+          <p className="font-semibold text-green-600">
+            Account created successfully!
+          </p>
+
+          <p className="text-sm text-slate-500">
+            Login now...
+          </p>
+        </div>
+      ) : null}
+
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={isLoading || isSuccess}
+      >
+        {isLoading ? "Creating Account..." : "Create Account"}
       </Button>
     </form>
   );
