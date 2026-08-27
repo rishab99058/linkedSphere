@@ -113,11 +113,11 @@ jobs:
         run: |
           echo "======================================"
           echo "Building auth-service"
-          echo "Platform: linux/arm64"
+          echo "Platform: linux/amd64"
           echo "======================================"
 
           docker buildx build \
-            --platform linux/arm64 \
+            --platform linux/amd64 \
             -f backend/services/auth-service/Dockerfile \
             -t "linksphere/auth-service:${GITHUB_SHA}" \
             --load \
@@ -132,11 +132,11 @@ jobs:
         run: |
           echo "======================================"
           echo "Building user-service"
-          echo "Platform: linux/arm64"
+          echo "Platform: linux/amd64"
           echo "======================================"
 
           docker buildx build \
-            --platform linux/arm64 \
+            --platform linux/amd64 \
             -f backend/services/user-service/Dockerfile \
             -t "linksphere/user-service:${GITHUB_SHA}" \
             --load \
@@ -151,11 +151,11 @@ jobs:
         run: |
           echo "======================================"
           echo "Building notification-service"
-          echo "Platform: linux/arm64"
+          echo "Platform: linux/amd64"
           echo "======================================"
 
           docker buildx build \
-            --platform linux/arm64 \
+            --platform linux/amd64 \
             -f backend/services/notification-service/Dockerfile \
             -t "linksphere/notification-service:${GITHUB_SHA}" \
             --load \
@@ -170,11 +170,11 @@ jobs:
         run: |
           echo "======================================"
           echo "Building gateway-service"
-          echo "Platform: linux/arm64"
+          echo "Platform: linux/amd64"
           echo "======================================"
 
           docker buildx build \
-            --platform linux/arm64 \
+            --platform linux/amd64 \
             -f backend/services/gateway-service/Dockerfile \
             -t "linksphere/gateway-service:${GITHUB_SHA}" \
             --load \
@@ -189,11 +189,11 @@ jobs:
         run: |
           echo "======================================"
           echo "Building discovery-server"
-          echo "Platform: linux/arm64"
+          echo "Platform: linux/amd64"
           echo "======================================"
 
           docker buildx build \
-            --platform linux/arm64 \
+            --platform linux/amd64 \
             -f backend/services/discovery-server/Dockerfile \
             -t "linksphere/discovery-server:${GITHUB_SHA}" \
             --load \
