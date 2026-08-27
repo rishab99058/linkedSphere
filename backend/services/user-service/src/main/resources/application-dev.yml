@@ -6,13 +6,25 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://discovery-server:8761/eureka/
+      defaultZone: https://linksphere-discovery-server-190262577212.asia-south2.run.app/eureka/
+  instance:
+    prefer-ip-address: false
+    hostname: ${SERVICE_HOSTNAME}
+    secure-port-enabled: true
+    secure-port: 443
+    non-secure-port-enabled: false
 
 spring:
   datasource:
-    url: jdbc:postgresql://aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres
-    username: postgres.tzxyfgbydsstlrzligru
-    password: 72098067389905893940
+    url: jdbc:postgresql://pg-3912173-rishab99058-5e60.i.aivencloud.com:20716/defaultdb?sslmode=require
+    username: avnadmin
+    password: AVNS_Xhup2M_IA5IozHRKn2e
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 1
+      connection-timeout: 30000
+      idle-timeout: 60000
+      max-lifetime: 1800000
   cloud:
     openfeign:
       client:
