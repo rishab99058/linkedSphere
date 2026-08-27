@@ -5,6 +5,12 @@ eureka:
   client:
     service-url:
       defaultZone: https://linksphere-discovery-server-190262577212.asia-south2.run.app/eureka/
+  instance:
+    prefer-ip-address: false
+    hostname: ${SERVICE_HOSTNAME}
+    secure-port-enabled: true
+    secure-port: 443
+    non-secure-port-enabled: false
 
 spring:
   cloud:
