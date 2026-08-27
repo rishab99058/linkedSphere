@@ -12,7 +12,7 @@ spring:
   datasource:
     url: jdbc:postgresql://pg-3912173-rishab99058-5e60.i.aivencloud.com:20716/defaultdb?sslmode=require
     username: avnadmin
-    password: ${DB_PASSWORD}
+    password: AVNS_Xhup2M_IA5IozHRKn2e
     hikari:
       maximum-pool-size: 3
       minimum-idle: 1
