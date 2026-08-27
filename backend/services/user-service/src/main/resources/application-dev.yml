@@ -1,16 +1,18 @@
 server:
-  port: 7999
+  port: ${PORT:7999}
   servlet:
     context-path: /users
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://discovery-server:8761/eureka/
 
 spring:
   datasource:
-    url: jdbc:postgresql://db.tzxyfgbydsstlrzligru.supabase.co:5432/postgres?user=postgres&password=linkedSphere%4012345
+    url: jdbc:postgresql://aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres
+    username: postgres.tzxyfgbydsstlrzligru
+    password: 72098067389905893940
   cloud:
     openfeign:
       client:
@@ -38,5 +40,3 @@ jwt:
   access-token-expiration: 900000
   refresh-token-expiration: 604800000
   issuer: "linksphere-auth-service"
-
-

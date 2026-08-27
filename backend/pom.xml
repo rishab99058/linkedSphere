@@ -18,7 +18,7 @@
 
     <name>LinkSphere Backend</name>
 
-    <description>Parent project service for LinkSphere backend services</description>
+    <description>Parent project for LinkSphere backend services</description>
 
     <properties>
     <java.version>21</java.version>
