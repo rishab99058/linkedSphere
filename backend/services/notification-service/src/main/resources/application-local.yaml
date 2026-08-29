@@ -1,0 +1,52 @@
+server:
+  port: 9000
+  servlet:
+    context-path: /notifications
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  datasource:
+    url: jdbc:postgresql://aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres
+    username: postgres.tzxyfgbydsstlrzligru
+    password: 72098067389905893940
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: never
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: akhandps2002.com@gmail.com
+    password: dkgiqqatdzqgmekv
+
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  rabbitmq:
+    host: warthog.lmq.cloudamqp.com
+    port: 5671
+    username: bepmlbwp
+    virtual-host: bepmlbwp
+    password: SRzPZy6UL8ZtZLfONaGd9rjj4K64PYHl
+    ssl:
+      enabled: true

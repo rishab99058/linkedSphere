@@ -1,0 +1,71 @@
+server:
+  port: ${PORT:8000}
+  servlet:
+    context-path: /auth
+
+eureka:
+  client:
+    service-url:
+      defaultZone: https://linksphere-discovery-server-190262577212.asia-south2.run.app/eureka/
+  instance:
+    prefer-ip-address: false
+    hostname: ${SERVICE_HOSTNAME}
+    secure-port-enabled: true
+    secure-port: 443
+    non-secure-port-enabled: false
+
+spring:
+  datasource:
+    url: jdbc:postgresql://pg-3912173-rishab99058-5e60.i.aivencloud.com:20716/defaultdb?sslmode=require
+    username: avnadmin
+    password: AVNS_Xhup2M_IA5IozHRKn2e
+
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 1
+      connection-timeout: 30000
+      idle-timeout: 60000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: never
+
+  rabbitmq:
+    host: warthog.lmq.cloudamqp.com
+    port: 5671
+    username: bepmlbwp
+    virtual-host: bepmlbwp
+    password: SRzPZy6UL8ZtZLfONaGd9rjj4K64PYHl
+    ssl:
+      enabled: true
+
+  data:
+    redis:
+      host: known-doe-132811.upstash.io
+      port: 6379
+      username: default
+      password: gQAAAAAAAgbLAAIgcDIzYTYyYjY3ZTI1NzI0OGJiODYzMTdiYTQ0OGFjZDM1Ng
+      ssl:
+        enabled: true
+
+jwt:
+  secret: "0f6a9a5e2c5b4d8f3a2b7c9d1e4f6a8b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5"
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000
+  issuer: "linksphere-auth-service"
+
+google:
+  oauth:
+    client-ids: "190262577212-mkpofmng8u4csgijo38s0ev8fs2j6jmc.apps.googleusercontent.com"

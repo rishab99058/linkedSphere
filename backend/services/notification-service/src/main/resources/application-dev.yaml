@@ -1,0 +1,64 @@
+server:
+  port: ${PORT:9000}
+  servlet:
+    context-path: /notifications
+
+eureka:
+  client:
+    service-url:
+      defaultZone: https://linksphere-discovery-server-190262577212.asia-south2.run.app/eureka/
+  instance:
+    prefer-ip-address: false
+    hostname: ${SERVICE_HOSTNAME}
+    secure-port-enabled: true
+    secure-port: 443
+    non-secure-port-enabled: false
+
+spring:
+  datasource:
+    url: jdbc:postgresql://pg-3912173-rishab99058-5e60.i.aivencloud.com:20716/defaultdb?sslmode=require
+    username: avnadmin
+    password: AVNS_Xhup2M_IA5IozHRKn2e
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 1
+      connection-timeout: 30000
+      idle-timeout: 60000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: never
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: akhandps2002.com@gmail.com
+    password: dkgiqqatdzqgmekv
+
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  rabbitmq:
+    host: warthog.lmq.cloudamqp.com
+    port: 5671
+    username: bepmlbwp
+    virtual-host: bepmlbwp
+    password: SRzPZy6UL8ZtZLfONaGd9rjj4K64PYHl
+    ssl:
+      enabled: true

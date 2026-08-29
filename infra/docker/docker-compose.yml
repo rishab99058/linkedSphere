@@ -1,0 +1,158 @@
+services:
+
+  # =========================
+  # RabbitMQ
+  # =========================
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: linksphere-rabbitmq
+    restart: unless-stopped
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+    environment:
+      RABBITMQ_DEFAULT_USER: linksphere
+      RABBITMQ_DEFAULT_PASS: linksphere
+
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  # =========================
+  # Redis
+  # =========================
+  redis:
+    image: redis:8-alpine
+    container_name: linksphere-redis
+    restart: unless-stopped
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis-data:/data
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  # =========================
+  # Discovery Server
+  # =========================
+  # discovery-server:
+  #   image: rishab99058/linksphere-discovery-server:v1.0.0
+  #   container_name: linksphere-discovery-server
+  #   restart: unless-stopped
+  #
+  #   ports:
+  #     - "8761:8761"
+  #
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: dev
+  #     SERVER_PORT: 8761
+  #
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8761/eureka/apps"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+
+  # =========================
+  # Gateway Service
+  # =========================
+  # gateway-service:
+  #   image: rishab99058/linksphere-gateway-service:v1.0.0
+  #   container_name: linksphere-gateway-service
+  #   restart: unless-stopped
+  #
+  #   ports:
+  #     - "8080:8080"
+  #
+  #   depends_on:
+  #     discovery-server:
+  #       condition: service_healthy
+  #
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: dev
+  #     SERVER_PORT: 8080
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+
+
+  # =========================
+  # Auth Service
+  # =========================
+  # auth-service:
+  #   image: rishab99058/linksphere-auth-service:v1.0.2
+  #   container_name: linksphere-auth-service
+  #   restart: unless-stopped
+  #
+  #   ports:
+  #     - "8082:8082"
+  #
+  #   depends_on:
+  #     discovery-server:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
+  #
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: dev
+  #     SERVER_PORT: 8082
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+  #     SPRING_DATA_REDIS_HOST: redis
+  #     SPRING_DATA_REDIS_PORT: 6379
+  #     SPRING_RABBITMQ_HOST: rabbitmq
+  #     SPRING_RABBITMQ_PORT: 5672
+  #     SPRING_RABBITMQ_USERNAME: linksphere
+  #     SPRING_RABBITMQ_PASSWORD: linksphere
+
+
+  # =========================
+  # User Service
+  # =========================
+  # user-service:
+  #   image: rishab99058/linksphere-user-service:v1.1.2
+  #   container_name: linksphere-user-service
+  #   restart: unless-stopped
+  #
+  #   ports:
+  #     - "8081:8081"
+  #
+  #   depends_on:
+  #     discovery-server:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
+  #
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: dev
+  #     SERVER_PORT: 8081
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+  #     SPRING_RABBITMQ_HOST: rabbitmq
+  #     SPRING_RABBITMQ_PORT: 5672
+  #     SPRING_RABBITMQ_USERNAME: linksphere
+  #     SPRING_RABBITMQ_PASSWORD: linksphere
+
+
+volumes:
+  redis-data:
+  rabbitmq-data:
+
+
+# PostgreSQL:
+# docker exec -it linksphere-postgres \
+#   psql -U postgres -c "CREATE DATABASE linksphere;"

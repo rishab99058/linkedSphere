@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+# api version of deployment
+kind: Deployment
+# telling I want to create deployment object
+metadata:
+  name: auth-service
+# meta data tells about the deployment object
+spec:
+  replicas: 1
+  # no of replicas
+  selector:
+    matchLabels:
+      app: auth-service
+# it selectes the pods based on the labels
+

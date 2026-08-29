@@ -1,0 +1,47 @@
+server:
+  port: ${PORT:8080}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: https://linksphere-discovery-server-190262577212.asia-south2.run.app/eureka/
+  instance:
+    prefer-ip-address: false
+    hostname: ${SERVICE_HOSTNAME}
+    secure-port-enabled: true
+    secure-port: 443
+    non-secure-port-enabled: false
+
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins:
+              - "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/users/**
+
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/notifications/**
