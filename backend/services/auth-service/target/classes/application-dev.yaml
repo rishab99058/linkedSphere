@@ -68,5 +68,4 @@ jwt:
 
 google:
   oauth:
-    client-ids:
-      - 190262577212-mkpofmng8u4csgijo38s0ev8fs2j6jmc.apps.googleusercontent.com
+    client-ids: "190262577212-mkpofmng8u4csgijo38s0ev8fs2j6jmc.apps.googleusercontent.com"
