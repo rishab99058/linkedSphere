@@ -1,0 +1,112 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "frontend/**"
+      - "scripts/detect-frontend-changes.sh"
+      - ".github/workflows/frontend-ci.yml"
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - "frontend/**"
+      - "scripts/detect-frontend-changes.sh"
+      - ".github/workflows/frontend-ci.yml"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    name: Frontend Build & Push to GHCR
+    runs-on: ubuntu-latest
+
+    steps:
+      # =========================================================
+      # CHECKOUT
+      # =========================================================
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # =========================================================
+      # DETECT FRONTEND CHANGES
+      # =========================================================
+      - name: Detect Frontend Changes
+        id: changes
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          chmod +x scripts/detect-frontend-changes.sh
+          ./scripts/detect-frontend-changes.sh "$BASE_SHA" "$HEAD_SHA"
+
+      # =========================================================
+      # SETUP PNPM & NODE (FOR LINT/TYPECHECK/VALIDATION)
+      # =========================================================
+      - name: Setup Node.js
+        if: steps.changes.outputs.frontend_changed == 'true' || github.event_name == 'workflow_dispatch'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        if: steps.changes.outputs.frontend_changed == 'true' || github.event_name == 'workflow_dispatch'
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Install Dependencies & Verify Build
+        if: steps.changes.outputs.frontend_changed == 'true' || github.event_name == 'workflow_dispatch'
+        working-directory: frontend/linkedSphere-web
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+
+      # =========================================================
+      # DOCKER / BUILDX
+      # =========================================================
+      - name: Set up Docker Buildx
+        if: steps.changes.outputs.frontend_changed == 'true' || github.event_name == 'workflow_dispatch'
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64
+
+      # =========================================================
+      # GITHUB CONTAINER REGISTRY LOGIN
+      # =========================================================
+      - name: Login to GHCR
+        if: steps.changes.outputs.frontend_changed == 'true' || github.event_name == 'workflow_dispatch'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # =========================================================
+      # BUILD & PUSH DOCKER IMAGE
+      # =========================================================
+      - name: Build and Push Frontend Image to GHCR
+        if: steps.changes.outputs.frontend_changed == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/linksphere-web"
+          IMAGE_TAG="${{ github.sha }}"
+
+          echo "======================================"
+          echo "Building & Pushing Frontend Docker Image"
+          echo "Image: ${IMAGE_NAME}:${IMAGE_TAG}"
+          echo "Platform: linux/amd64"
+          echo "======================================"
+
+          docker buildx build \
+            --platform linux/amd64 \
+            -f frontend/linkedSphere-web/Dockerfile \
+            -t "${IMAGE_NAME}:${IMAGE_TAG}" \
+            -t "${IMAGE_NAME}:latest" \
+            --push \
+            frontend/linkedSphere-web

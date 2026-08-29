@@ -2,7 +2,7 @@ import axios from "axios";
 import { getAccessToken } from "./auth-storage";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "https://linksphere-gateway-service-190262577212.asia-south2.run.app",
   headers: {
     "Content-Type": "application/json",
   },

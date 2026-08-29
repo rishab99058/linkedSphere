@@ -2,7 +2,7 @@ import {Bell, Home, Menu, Network, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { clearAuthStorage, getRefreshToken, removeAccessToken } from "@/lib/auth-storage";
+import { clearAuthStorage, getRefreshToken } from "@/lib/auth-storage";
 import { logoutUser } from "@/features/auth/api/auth-api";
 
 function Navbar() {
