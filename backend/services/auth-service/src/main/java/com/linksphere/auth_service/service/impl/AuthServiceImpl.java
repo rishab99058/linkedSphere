@@ -2,7 +2,9 @@ package com.linksphere.auth_service.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.linksphere.auth_service.dto.request.ForgotPasswordRequest;
+import com.linksphere.auth_service.dto.request.GoogleLoginRequest;
 import com.linksphere.auth_service.dto.request.LoginRequest;
 import com.linksphere.auth_service.dto.request.RefreshTokenRequest;
 import com.linksphere.auth_service.dto.request.RegisterRequest;
@@ -23,6 +25,7 @@ import com.linksphere.auth_service.rabbitmq.MailEventPublisher;
 import com.linksphere.auth_service.repository.PasswordResetOtpEntityRepository;
 import com.linksphere.auth_service.repository.RoleRepository;
 import com.linksphere.auth_service.repository.UserRepository;
+import com.linksphere.auth_service.security.jwt.GoogleTokenService;
 import com.linksphere.auth_service.security.jwt.JwtProperties;
 import com.linksphere.auth_service.security.jwt.JwtService;
 import com.linksphere.auth_service.security.refresh.RefreshTokenService;
@@ -65,6 +68,7 @@ public class AuthServiceImpl implements AuthService {
         private static final SecureRandom RANDOM = new SecureRandom();
         private final ObjectMapper objectMapper;
         private final MailEventPublisher mailEventPublisher;
+        private final GoogleTokenService googleTokenService;
 
         @Override
         public RegisterResponse register(RegisterRequest request) {
@@ -273,6 +277,90 @@ public class AuthServiceImpl implements AuthService {
                 return ResetPasswordResponse.builder()
                                 .message("Password reset successfully")
                                 .build();
+        }
+
+        @Override
+        public LoginResponse googleLogin(GoogleLoginRequest request) {
+
+                GoogleIdToken.Payload payload = googleTokenService.verify(request.getIdToken());
+
+                String googleId = payload.getSubject();
+                String email = payload.getEmail();
+
+                Boolean emailVerified = Boolean.TRUE.equals(payload.getEmailVerified());
+
+                if (!emailVerified) {
+                        throw new BaseException(ErrorCode.INVALID_CREDENTIALS);
+                }
+
+                UserEntity user = userRepository
+                                .findByEmail(email)
+                                .orElseGet(() -> createGoogleUser(
+                                                googleId,
+                                                email));
+
+                if (Boolean.TRUE.equals(user.getDeleted())
+                                || user.getAccountStatus() != AccountStatus.ACTIVE) {
+
+                        throw new BaseException(ErrorCode.ACCESS_DENIED);
+                }
+
+                CustomUserDetails userDetails = new CustomUserDetails(user);
+
+                String accessToken = jwtService.generateAccessToken(userDetails);
+
+                String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+                UUID sessionId = jwtService.extractSessionId(refreshToken);
+
+                refreshTokenService.saveSession(
+                                sessionId.toString(),
+                                userDetails.getId(),
+                                jwtProperties.getAccessTokenExpiration() / 1000);
+
+                return LoginResponse.builder()
+                                .accessToken(accessToken)
+                                .refreshToken(refreshToken)
+                                .tokenType("Bearer")
+                                .expiresIn(
+                                                jwtProperties.getAccessTokenExpiration() / 1000)
+                                .build();
+        }
+
+        private UserEntity createGoogleUser(
+                        String googleId,
+                        String email) {
+
+                RoleEntity defaultRole = roleRepository
+                                .findByName("ROLE_USER")
+                                .orElseThrow(() -> new BaseException(
+                                                ErrorCode.ROLE_NOT_FOUND));
+
+                UserEntity user = UserEntity.builder()
+                                .email(email)
+                                .password(
+                                                passwordEncoder.encode(
+                                                                UUID.randomUUID().toString()))
+                                .provider(AuthProvider.GOOGLE)
+                                .providerId(googleId)
+                                .emailVerified(true)
+                                .accountStatus(AccountStatus.ACTIVE)
+                                .deleted(false)
+                                .build();
+
+                UserRole userRole = UserRole.builder()
+                                .id(new UserRoleId(
+                                                user.getId(),
+                                                defaultRole.getId()))
+                                .role(defaultRole)
+                                .user(user)
+                                .build();
+
+                user.getUserRoles().add(userRole);
+
+                UserEntity savedUser = userRepository.save(user);
+
+                return savedUser;
         }
 
 }

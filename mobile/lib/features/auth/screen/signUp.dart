@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:mobile/core/colors.dart';
 import 'package:mobile/core/costants.dart';
 import 'package:mobile/core/validators.dart';
+import 'package:mobile/features/auth/model/signin_request.dart';
+import 'package:mobile/features/auth/repository/authRepository.dart';
 import 'package:mobile/features/auth/screen/login.dart';
+import 'package:mobile/network/apiClient.dart';
 import 'package:mobile/shared/widgets/appButton.dart';
 import 'package:mobile/shared/widgets/appTextField.dart';
+import 'package:mobile/shared/widgets/appToast.dart';
 import 'package:mobile/shared/widgets/textButton.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -15,6 +19,15 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final ApiClient _apiClient = ApiClient();
+  late final AuthRepository _authRepository;
+
+  @override
+  void initState() {
+    super.initState();
+    _authRepository = AuthRepository(_apiClient);
+  }
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
@@ -34,11 +47,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  void _handleSignUp() {
+  Future<void> _handleSignUp() async {
     FocusScope.of(context).unfocus();
 
     if (_formKey.currentState!.validate()) {
       // Backend login API will come here.
+      try {
+        final request = SigninRequest(
+          email: emailController.text,
+          password: passwordController.text,
+          phoneNumber: phoneNumberController.text,
+        );
+        final response = await _authRepository.signin(request);
+
+        if (!mounted) return;
+
+        AppToast.success(response.message);
+        _moveToLogin();
+      } catch (e) {
+        if (!mounted) return;
+        debugPrint('SignUp error: $e');
+        AppToast.error(e.toString());
+      }
     }
   }
 

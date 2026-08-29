@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:mobile/core/colors.dart';
 
 class AppTextButton extends StatelessWidget {
-  const AppTextButton({super.key, required this.text, required this.onPressed});
+  const AppTextButton({super.key, required this.text, this.onPressed});
 
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {

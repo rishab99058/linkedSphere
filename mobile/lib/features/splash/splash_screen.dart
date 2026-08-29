@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile/core/costants.dart';
+import 'package:mobile/features/auth/screen/login.dart';
 import 'package:mobile/features/onboarding/screens/onboarding.dart';
+import 'package:mobile/storage/secure_storage.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,6 +14,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
@@ -24,13 +29,24 @@ class _SplashScreenState extends State<SplashScreen> {
     );
 
     // Navigate to OnBoardingScreen after 3 seconds
-    Future.delayed(const Duration(seconds: 10), _goToHome);
+    _timer = Timer(const Duration(seconds: 3), _goToHome);
   }
 
-  void _goToHome() {
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _goToHome() async {
     if (!mounted) return;
+    bool isFirstLaunch = await SecureStorage.getIsFirstLaunch();
+    bool isLoggedIn = await SecureStorage.getIsLoggedIn();
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const OnBoardingScreen()),
+      MaterialPageRoute(
+        builder: (_) =>
+            isFirstLaunch ? const OnBoardingScreen() : const LoginScreen(),
+      ),
     );
   }
 
@@ -45,14 +61,14 @@ class _SplashScreenState extends State<SplashScreen> {
           padding: const EdgeInsets.all(32.0),
           child: Image.network(
             AppConstants.appLogoUrl,
-            width: 350,
-            height: 350,
+            width: 600,
+            height: 600,
             fit: BoxFit.contain,
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;
               return const SizedBox(
-                width: 350,
-                height: 350,
+                width: 600,
+                height: 600,
                 child: Center(child: CircularProgressIndicator.adaptive()),
               );
             },

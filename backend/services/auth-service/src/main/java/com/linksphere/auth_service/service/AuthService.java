@@ -1,6 +1,7 @@
 package com.linksphere.auth_service.service;
 
 import com.linksphere.auth_service.dto.request.ForgotPasswordRequest;
+import com.linksphere.auth_service.dto.request.GoogleLoginRequest;
 import com.linksphere.auth_service.dto.request.LoginRequest;
 import com.linksphere.auth_service.dto.request.RefreshTokenRequest;
 import com.linksphere.auth_service.dto.request.RegisterRequest;
@@ -24,5 +25,7 @@ public interface AuthService {
     ForgotPasswordRespose forgotPassword(ForgotPasswordRequest request);
 
     ResetPasswordResponse resetPassword(ResetPasswordRequest request);
+
+    LoginResponse googleLogin(GoogleLoginRequest request);
 
 }

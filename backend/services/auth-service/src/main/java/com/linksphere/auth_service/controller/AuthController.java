@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import com.linksphere.auth_service.service.AuthService;
 import com.linksphere.auth_service.dto.request.ForgotPasswordRequest;
+import com.linksphere.auth_service.dto.request.GoogleLoginRequest;
 import com.linksphere.auth_service.dto.request.LoginRequest;
 import com.linksphere.auth_service.dto.request.RefreshTokenRequest;
 import com.linksphere.auth_service.dto.request.RegisterRequest;
@@ -61,5 +62,11 @@ public class AuthController {
     }
 
     // social Login
+    @PostMapping("/google")
+    public ResponseEntity<LoginResponse> googleLogin(
+            @Valid @RequestBody GoogleLoginRequest request) {
+        return ResponseEntity.ok(
+                authService.googleLogin(request));
+    }
 
 }

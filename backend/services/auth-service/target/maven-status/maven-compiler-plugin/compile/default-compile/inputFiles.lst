@@ -1,9 +1,11 @@
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/AuthServiceApplication.java
+/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/config/GoogleOAuthConfig.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/config/SecurityConfig.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/controller/AuthController.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/controller/ProfileController.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/controller/RabbitMQTestController.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/request/ForgotPasswordRequest.java
+/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/request/GoogleLoginRequest.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/request/LoginRequest.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/request/RefreshTokenRequest.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/request/RegisterRequest.java
@@ -26,6 +28,7 @@
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/repository/PasswordResetOtpEntityRepository.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/repository/RoleRepository.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/repository/UserRepository.java
+/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/security/jwt/GoogleTokenService.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/security/jwt/JwtAuthenticationFilter.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/security/jwt/JwtAutheticationFilter.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/security/jwt/JwtProperties.java

@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/core/colors.dart';
 import 'package:mobile/core/costants.dart';
+import 'package:mobile/core/google_service_auth.dart';
 import 'package:mobile/core/validators.dart';
+import 'package:mobile/features/auth/model/login_request.dart';
+import 'package:mobile/features/auth/repository/authRepository.dart';
+import 'package:mobile/features/auth/screen/forgot_password.dart';
 import 'package:mobile/features/auth/screen/signUp.dart';
+import 'package:mobile/features/main/bottom_navigation_bar.dart';
+import 'package:mobile/features/offline_screen/no_internet.dart';
+import 'package:mobile/network/apiClient.dart';
 import 'package:mobile/shared/widgets/appButton.dart';
 import 'package:mobile/shared/widgets/appTextField.dart';
+import 'package:mobile/shared/widgets/appToast.dart';
 import 'package:mobile/shared/widgets/textButton.dart';
+import 'package:mobile/storage/secure_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +25,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  final ApiClient _apiClient = ApiClient();
+  late final AuthRepository _authRepository;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -24,28 +35,108 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isObscure = true;
 
   @override
+  void initState() {
+    super.initState();
+    _authRepository = AuthRepository(_apiClient);
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _handleLogin() {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadRememberedCredentials();
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    try {
+      final googleUser = await GoogleAuthService.signIn();
+
+      if (googleUser != null) {
+        debugPrint('Google Sign-In Success: ${googleUser.email}');
+        AppToast.success('Google Sign-In Successful');
+      }
+    } catch (e) {
+      debugPrint('Google Sign-In Error: $e');
+      AppToast.error(e.toString());
+    }
+  }
+
+  Future<void> _loadRememberedCredentials() async {
+    final rememberMe = await SecureStorage.getRememberMe();
+    final email = await SecureStorage.getSavedEmail();
+    final password = await SecureStorage.getSavedPassword();
+
+    if (mounted && rememberMe && email != null && password != null) {
+      setState(() {
+        _rememberMe = rememberMe;
+        _emailController.text = email;
+        _passwordController.text = password;
+      });
+    }
+  }
+
+  Future<void> _saveRememberedCredentials() async {
+    if (_rememberMe) {
+      await SecureStorage.saveRememberMe(_rememberMe);
+      await SecureStorage.saveSavedEmail(_emailController.text);
+      await SecureStorage.saveSavedPassword(_passwordController.text);
+    } else {
+      await SecureStorage.clearRememberedCredentials();
+    }
+  }
+
+  Future<void> _handleLogin() async {
     FocusScope.of(context).unfocus();
 
     if (_formKey.currentState!.validate()) {
       // Backend login API will come here.
-    }
-  }
+      final request = LoginRequest(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
 
-  void _handleGoogleLogin() {
-    // Google authentication will come here.
+      try {
+        final response = await _authRepository.login(request);
+
+        if (!mounted) return;
+
+        AppToast.success('Login successful');
+
+        debugPrint('Login successful');
+        SecureStorage.saveIsLoggedIn(true);
+        SecureStorage.saveAccessToken(response.accessToken);
+        SecureStorage.saveTokenType(response.tokenType);
+        SecureStorage.saveRefreshToken(response.refreshToken);
+        SecureStorage.saveExpiresIn(response.expiresIn);
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => const MainScreen()));
+      } catch (e) {
+        if (!mounted) return;
+
+        debugPrint('Login error: $e');
+
+        AppToast.error(e.toString());
+      }
+    }
   }
 
   void _navigateToSignUp() {
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => const SignUpScreen()));
+  }
+
+  void _navigateToForgotPasswordScreen() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const ForgotPassword()));
   }
 
   @override
@@ -134,6 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onChanged: (value) {
                         setState(() {
                           _rememberMe = value ?? false;
+                          _saveRememberedCredentials();
                         });
                       },
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -154,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     AppTextButton(
                       text: 'Forgot Password?',
                       onPressed: () {
-                        // Forgot password screen later.
+                        _navigateToForgotPasswordScreen();
                       },
                     ),
                   ],
@@ -229,7 +321,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: AppButton(
-                    onPressed: _handleGoogleLogin,
+                    onPressed: _handleGoogleSignIn,
                     text: 'Continue with Google',
                     color: const Color(0xFFF1F5F9),
                     textColor: Colors.black,
