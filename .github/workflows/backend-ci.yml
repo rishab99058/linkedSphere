@@ -350,14 +350,14 @@ jobs:
       - name: Deploy Discovery Server
         if: contains(steps.affected.outputs.affected_services, 'discovery-server')
         run: |
-          gcloud run deploy discovery-server \
+          gcloud run deploy linksphere-discovery-server \
             --image="ghcr.io/${{ github.repository_owner }}/linksphere-discovery-server:${GITHUB_SHA}" \
             --region="asia-south2" \
             --project="${{ secrets.GCP_DEV_PROJECT_ID }}" \
             --platform=managed \
             --port=8761 \
             --allow-unauthenticated \
-            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_DISCOVERY_SERVICE_HOSTNAME}}"
 
       # =========================================================
       # DEPLOY GATEWAY SERVER
@@ -366,14 +366,14 @@ jobs:
       - name: Deploy Gateway Server
         if: contains(steps.affected.outputs.affected_services, 'gateway-service')
         run: |
-          gcloud run deploy gateway-service \
+          gcloud run deploy linksphere-gateway-service \
             --image="ghcr.io/${{ github.repository_owner }}/linksphere-gateway-service:${GITHUB_SHA}" \
             --region="asia-south2" \
             --project="${{ secrets.GCP_DEV_PROJECT_ID }}" \
             --platform=managed \
             --port=8080 \
             --allow-unauthenticated \
-            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_GATEWAY_SERVICE_HOSTNAME}}"
 
       # =========================================================
       # DEPLOY AUTH SERVICE
@@ -382,14 +382,14 @@ jobs:
       - name: Deploy Auth Service
         if: contains(steps.affected.outputs.affected_services, 'auth-service')
         run: |
-          gcloud run deploy auth-service \
+          gcloud run deploy linksphere-auth-service \
             --image="ghcr.io/${{ github.repository_owner }}/linksphere-auth-service:${GITHUB_SHA}" \
             --region="asia-south2" \
             --project="${{ secrets.GCP_DEV_PROJECT_ID }}" \
             --platform=managed \
             --port=8000 \
             --allow-unauthenticated \
-            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_AUTH_SERVICE_HOSTNAME}}"
 
       # =========================================================
       # DEPLOY USER SERVICE
@@ -398,14 +398,14 @@ jobs:
       - name: Deploy User Service
         if: contains(steps.affected.outputs.affected_services, 'user-service')
         run: |
-          gcloud run deploy user-service \
+          gcloud run deploy linksphere-user-service \
             --image="ghcr.io/${{ github.repository_owner }}/linksphere-user-service:${GITHUB_SHA}" \
             --region="asia-south2" \
             --project="${{ secrets.GCP_DEV_PROJECT_ID }}" \
             --platform=managed \
             --port=7999 \
             --allow-unauthenticated \
-            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_USER_SERVICE_HOSTNAME}}"
 
       # =========================================================
       # DEPLOY NOTIFICATION SERVICE
@@ -414,11 +414,11 @@ jobs:
       - name: Deploy Notification Service
         if: contains(steps.affected.outputs.affected_services, 'notification-service')
         run: |
-          gcloud run deploy notification-service \
+          gcloud run deploy linksphere-notification-service \
             --image="ghcr.io/${{ github.repository_owner }}/linksphere-notification-service:${GITHUB_SHA}" \
             --region="asia-south2" \
             --project="${{ secrets.GCP_DEV_PROJECT_ID }}" \
             --platform=managed \
             --port=9000 \
             --allow-unauthenticated \
-            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_NOTIFICATION_SERVICE_HOSTNAME}}"

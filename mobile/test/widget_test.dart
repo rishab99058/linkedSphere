@@ -11,6 +11,10 @@ void main() {
 
     // Verify that the splash screen shows an Image widget.
     expect(find.byType(Image), findsOneWidget);
+
+    // Allow timers to clean up
+    await tester.pump(const Duration(seconds: 4));
   });
 }
+
 

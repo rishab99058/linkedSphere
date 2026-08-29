@@ -12,6 +12,7 @@ com/linksphere/auth_service/rabbitmq/RabbitMQConfig.class
 com/linksphere/auth_service/entity/UserEntity$UserEntityBuilder.class
 com/linksphere/auth_service/rabbitmq/MailEventPublisher.class
 com/linksphere/auth_service/dto/request/RegisterRequest.class
+com/linksphere/auth_service/config/GoogleOAuthConfig.class
 com/linksphere/auth_service/security/refresh/RefreshTokenService.class
 com/linksphere/auth_service/security/user/CustomUserDetailsService.class
 com/linksphere/auth_service/security/user/CustomUserDetails.class
@@ -27,8 +28,10 @@ com/linksphere/auth_service/dto/response/LoginResponse$LoginResponseBuilder.clas
 com/linksphere/auth_service/dto/response/ForgotPasswordRespose.class
 com/linksphere/auth_service/repository/PasswordResetOtpEntityRepository.class
 com/linksphere/auth_service/entity/UserRole.class
+com/linksphere/auth_service/security/jwt/GoogleTokenService.class
 com/linksphere/auth_service/controller/AuthController.class
 com/linksphere/auth_service/enums/AuthProvider.class
+com/linksphere/auth_service/dto/request/GoogleLoginRequest.class
 com/linksphere/auth_service/security/jwt/JwtService.class
 com/linksphere/auth_service/dto/response/ResetPasswordResponse$ResetPasswordResponseBuilder.class
 com/linksphere/auth_service/dto/response/ResetPasswordResponse.class

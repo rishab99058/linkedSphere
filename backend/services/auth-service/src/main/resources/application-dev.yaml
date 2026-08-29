@@ -65,3 +65,7 @@ jwt:
   access-token-expiration: 900000
   refresh-token-expiration: 604800000
   issuer: "linksphere-auth-service"
+
+google:
+  oauth:
+    client-ids: "190262577212-mkpofmng8u4csgijo38s0ev8fs2j6jmc.apps.googleusercontent.com"

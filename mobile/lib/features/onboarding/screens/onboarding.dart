@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile/core/colors.dart';
 import 'package:mobile/core/costants.dart';
 import 'package:mobile/features/auth/screen/login.dart';
-import 'package:mobile/features/home/home_screen.dart';
 import 'package:mobile/features/onboarding/widgets/onboardscreen.dart';
+import 'package:mobile/storage/secure_storage.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -23,6 +23,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   }
 
   void _navigateToHome() {
+    SecureStorage.saveIsFirstLaunch(false);
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (_, __, ___) => const LoginScreen(),
