@@ -357,7 +357,7 @@ jobs:
             --platform=managed \
             --port=8761 \
             --allow-unauthenticated \
-            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_DISCOVERY_SERVICE_HOSTNAME}}"
 
       # =========================================================
       # DEPLOY GATEWAY SERVER
@@ -373,7 +373,7 @@ jobs:
             --platform=managed \
             --port=8080 \
             --allow-unauthenticated \
-            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_GATEWAY_SERVICE_HOSTNAME}}"
 
       # =========================================================
       # DEPLOY AUTH SERVICE
@@ -389,7 +389,7 @@ jobs:
             --platform=managed \
             --port=8000 \
             --allow-unauthenticated \
-            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_AUTH_SERVICE_HOSTNAME}}"
 
       # =========================================================
       # DEPLOY USER SERVICE
@@ -405,6 +405,7 @@ jobs:
             --platform=managed \
             --port=7999 \
             --allow-unauthenticated \
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_USER_SERVICE_HOSTNAME}}"
 
       # =========================================================
       # DEPLOY NOTIFICATION SERVICE
@@ -420,4 +421,4 @@ jobs:
             --platform=managed \
             --port=9000 \
             --allow-unauthenticated \
-            --set-env-vars="SPRING_PROFILES_ACTIVE=dev"
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_NOTIFICATION_SERVICE_HOSTNAME}}"
