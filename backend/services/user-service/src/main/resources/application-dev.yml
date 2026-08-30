@@ -15,6 +15,10 @@ eureka:
     non-secure-port-enabled: false
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
   datasource:
     url: jdbc:postgresql://pg-3912173-rishab99058-5e60.i.aivencloud.com:20716/defaultdb?sslmode=require
     username: avnadmin
@@ -52,3 +56,8 @@ jwt:
   access-token-expiration: 900000
   refresh-token-expiration: 604800000
   issuer: "linksphere-auth-service"
+
+imagekit:
+  public-key: public_RKLdGzOd0r27S2eOEwb0UjxDvXE=
+  private-key: private_VHI4gkUX6c3PHZEl/+aOkBDB+yQ=
+  url-endpoint: https://ik.imagekit.io/b4eam6xij

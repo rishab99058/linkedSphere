@@ -46,10 +46,11 @@ import java.util.UUID;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.security.core.Authentication;
 
 @Service
 @RequiredArgsConstructor
@@ -125,10 +126,16 @@ public class AuthServiceImpl implements AuthService {
         @Override
         public LoginResponse login(LoginRequest request) {
                 // TODO Auto-generated method stub
-                Authentication authentication = authenticationManager.authenticate(
-                                new UsernamePasswordAuthenticationToken(
-                                                request.getEmail(),
-                                                request.getPassword()));
+                Authentication authentication;
+                try {
+                        authentication = authenticationManager.authenticate(
+                                        new UsernamePasswordAuthenticationToken(
+                                                        request.getEmail(),
+                                                        request.getPassword()));
+                } catch (AuthenticationException e) {
+                        log.error("Authentication failed for user: {}", request.getEmail(), e);
+                        throw new BaseException(ErrorCode.INVALID_CREDENTIALS);
+                }
 
                 CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 

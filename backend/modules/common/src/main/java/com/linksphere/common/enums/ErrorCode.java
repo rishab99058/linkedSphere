@@ -1,6 +1,8 @@
 package com.linksphere.common.enums;
 
 import lombok.Getter;
+
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -66,7 +68,12 @@ public enum ErrorCode {
         RESOURCE_EXPIRED(
                         "HTTP_400",
                         "Resource expired",
-                        HttpStatus.BAD_REQUEST);
+                        HttpStatus.BAD_REQUEST),
+
+        PROFILE_NOT_FOUND(
+                        "PROFILE_NOT_FOUND",
+                        "Profile has not been set up",
+                        HttpStatus.NOT_FOUND);
 
         private final String code;
 

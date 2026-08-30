@@ -1,6 +1,7 @@
 import 'package:mobile/features/auth/model/change_password_request.dart';
 import 'package:mobile/features/auth/model/change_password_respose.dart';
 import 'package:mobile/features/auth/model/forgot_password_request.dart';
+import 'package:mobile/features/auth/model/google_sign_in_request.dart';
 import 'package:mobile/features/auth/model/login_request.dart';
 import 'package:mobile/features/auth/model/login_response.dart';
 import 'package:mobile/features/auth/model/reset_password_request.dart';
@@ -48,5 +49,13 @@ class AuthRepository {
       data: request.toJson(),
     );
     return ChangePasswordResponse.fromJson(response.data);
+  }
+
+  Future<LoginResponse> googleLogin(GoogleSignInRequest request) async {
+    final response = await apiClient.dio.post(
+      ApiEndpoints.googleLogin(),
+      data: request.toJson(),
+    );
+    return LoginResponse.fromJson(response.data);
   }
 }

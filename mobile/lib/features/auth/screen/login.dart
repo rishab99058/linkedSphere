@@ -3,12 +3,12 @@ import 'package:mobile/core/colors.dart';
 import 'package:mobile/core/costants.dart';
 import 'package:mobile/core/google_service_auth.dart';
 import 'package:mobile/core/validators.dart';
+import 'package:mobile/features/auth/model/google_sign_in_request.dart';
 import 'package:mobile/features/auth/model/login_request.dart';
 import 'package:mobile/features/auth/repository/authRepository.dart';
 import 'package:mobile/features/auth/screen/forgot_password.dart';
 import 'package:mobile/features/auth/screen/signUp.dart';
 import 'package:mobile/features/main/bottom_navigation_bar.dart';
-import 'package:mobile/features/offline_screen/no_internet.dart';
 import 'package:mobile/network/apiClient.dart';
 import 'package:mobile/shared/widgets/appButton.dart';
 import 'package:mobile/shared/widgets/appTextField.dart';
@@ -53,16 +53,44 @@ class _LoginScreenState extends State<LoginScreen> {
     _loadRememberedCredentials();
   }
 
-  Future<void> _handleGoogleSignIn() async {
+  Future<void> handleGoogleLogin() async {
     try {
-      final googleUser = await GoogleAuthService.signIn();
+      final account = await GoogleAuthService.signIn();
 
-      if (googleUser != null) {
-        debugPrint('Google Sign-In Success: ${googleUser.email}');
-        AppToast.success('Google Sign-In Successful');
+      if (account == null) {
+        return;
       }
+
+      final authentication = account.authentication;
+
+      final idToken = authentication.idToken;
+
+      if (idToken == null) {
+        throw Exception('Google ID token not found');
+      }
+
+      debugPrint('Google ID Token received: $idToken');
+
+      final request = GoogleSignInRequest(idToken: idToken);
+      final response = await _authRepository.googleLogin(request);
+      if (!mounted) return;
+      AppToast.success('Login successful');
+      debugPrint('Login successful');
+      debugPrint(response.accessToken);
+      debugPrint(response.tokenType);
+      debugPrint(response.refreshToken);
+      debugPrint(response.expiresIn.toString());
+      SecureStorage.saveIsLoggedIn(true);
+      SecureStorage.saveAccessToken(response.accessToken);
+      SecureStorage.saveTokenType(response.tokenType);
+      SecureStorage.saveRefreshToken(response.refreshToken);
+      SecureStorage.saveExpiresIn(response.expiresIn);
+
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (context) => const MainScreen()));
     } catch (e) {
-      debugPrint('Google Sign-In Error: $e');
+      debugPrint('Google Sign-In failed: $e');
       AppToast.error(e.toString());
     }
   }
@@ -321,7 +349,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: AppButton(
-                    onPressed: _handleGoogleSignIn,
+                    onPressed: () {
+                      handleGoogleLogin();
+                    },
                     text: 'Continue with Google',
                     color: const Color(0xFFF1F5F9),
                     textColor: Colors.black,

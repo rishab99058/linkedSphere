@@ -6,6 +6,8 @@ import com.linksphere.common.response.ApiErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,6 +23,24 @@ public class GlobalExceptionHandler {
         return buildResponse(
             ex.getErrorCode(),
             ex.getMessage(),
+            null
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
+        return buildResponse(
+            ErrorCode.INVALID_CREDENTIALS,
+            ErrorCode.INVALID_CREDENTIALS.getMessage(),
+            null
+        );
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiErrorResponse> handleAuthenticationException(AuthenticationException ex) {
+        return buildResponse(
+            ErrorCode.INVALID_CREDENTIALS,
+            ErrorCode.INVALID_CREDENTIALS.getMessage(),
             null
         );
     }
