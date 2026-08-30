@@ -9,6 +9,10 @@ eureka:
       defaultZone: http://localhost:8761/eureka
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
   datasource:
     url: jdbc:postgresql://aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres
     username: postgres.tzxyfgbydsstlrzligru
@@ -41,3 +45,8 @@ jwt:
   access-token-expiration: 900000
   refresh-token-expiration: 604800000
   issuer: "linksphere-auth-service"
+
+imagekit:
+  public-key: public_RKLdGzOd0r27S2eOEwb0UjxDvXE=
+  private-key: private_VHI4gkUX6c3PHZEl/+aOkBDB+yQ=
+  url-endpoint: https://ik.imagekit.io/b4eam6xij

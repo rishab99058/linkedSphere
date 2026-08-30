@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/core/colors.dart';
 import 'package:mobile/core/costants.dart';
+import 'package:mobile/core/google_service_auth.dart';
 import 'package:mobile/core/validators.dart';
+import 'package:mobile/features/auth/model/google_sign_in_request.dart';
 import 'package:mobile/features/auth/model/signin_request.dart';
 import 'package:mobile/features/auth/repository/authRepository.dart';
 import 'package:mobile/features/auth/screen/login.dart';
+import 'package:mobile/features/main/bottom_navigation_bar.dart';
 import 'package:mobile/network/apiClient.dart';
 import 'package:mobile/shared/widgets/appButton.dart';
 import 'package:mobile/shared/widgets/appTextField.dart';
 import 'package:mobile/shared/widgets/appToast.dart';
 import 'package:mobile/shared/widgets/textButton.dart';
+import 'package:mobile/storage/secure_storage.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -45,6 +49,48 @@ class _SignUpScreenState extends State<SignUpScreen> {
     phoneNumberController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> handleGoogleLogin() async {
+    try {
+      final account = await GoogleAuthService.signIn();
+
+      if (account == null) {
+        return;
+      }
+
+      final authentication = account.authentication;
+
+      final idToken = authentication.idToken;
+
+      if (idToken == null) {
+        throw Exception('Google ID token not found');
+      }
+
+      debugPrint('Google ID Token received: $idToken');
+
+      final request = GoogleSignInRequest(idToken: idToken);
+      final response = await _authRepository.googleLogin(request);
+      if (!mounted) return;
+      AppToast.success('Login successful');
+      debugPrint('Login successful');
+      debugPrint(response.accessToken);
+      debugPrint(response.tokenType);
+      debugPrint(response.refreshToken);
+      debugPrint(response.expiresIn.toString());
+      SecureStorage.saveIsLoggedIn(true);
+      SecureStorage.saveAccessToken(response.accessToken);
+      SecureStorage.saveTokenType(response.tokenType);
+      SecureStorage.saveRefreshToken(response.refreshToken);
+      SecureStorage.saveExpiresIn(response.expiresIn);
+
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (context) => const MainScreen()));
+    } catch (e) {
+      debugPrint('Google Sign-In failed: $e');
+      AppToast.error(e.toString());
+    }
   }
 
   Future<void> _handleSignUp() async {
@@ -238,7 +284,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(height: 24),
 
                   AppButton(
-                    onPressed: () {},
+                    onPressed: handleGoogleLogin,
                     text: 'Continue with Google',
                     color: const Color(0xFFF1F5F9),
                     textColor: Colors.black,

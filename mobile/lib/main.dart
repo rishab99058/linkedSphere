@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile/app/app.dart';
 import 'package:mobile/config/appConfig.dart';
 import 'package:mobile/core/google_service_auth.dart';
-import 'package:mobile/features/splash/splash_screen.dart';
 import 'package:mobile/network/apiClient.dart';
 
 Future<void> main() async {
@@ -24,17 +24,4 @@ Future<void> main() async {
     print('❌ General Error: $e');
   }
   runApp(const LinkedSphereApp());
-}
-
-class LinkedSphereApp extends StatelessWidget {
-  const LinkedSphereApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'LinkedSphere',
-      home: const SplashScreen(),
-    );
-  }
 }

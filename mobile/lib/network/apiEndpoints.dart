@@ -11,6 +11,7 @@ class ApiEndpoints {
   static String logout() => '$_authPrefix/logout';
   static String forgotPassword() => '$_authPrefix/forgot-password';
   static String resetPassword() => '$_authPrefix/reset-password';
+  static String googleLogin() => '$_authPrefix/google';
 
   // Health
   static String health() => '/actuator/health';
