@@ -180,7 +180,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         if (!userProfile.isPresent()) {
             log.error("Profile not found for the given Id");
-            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw new BaseException(ErrorCode.PROFILE_NOT_FOUND);
         }
 
         CurrentUserResponse currentUser;
