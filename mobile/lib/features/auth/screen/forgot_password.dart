@@ -6,6 +6,7 @@ import 'package:mobile/features/auth/model/forgot_password_request.dart';
 import 'package:mobile/features/auth/repository/authRepository.dart';
 import 'package:mobile/features/auth/screen/reset_password.dart';
 import 'package:mobile/network/apiClient.dart';
+import 'package:mobile/network/api_error_handler.dart';
 import 'package:mobile/shared/widgets/appButton.dart';
 import 'package:mobile/shared/widgets/appTextField.dart';
 import 'package:mobile/shared/widgets/appToast.dart';
@@ -53,7 +54,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         );
       } catch (e) {
         if (!mounted) return;
-        AppToast.error(e.toString());
+        AppToast.error(ApiErrorHandler.getMessage(e));
       }
     }
   }

@@ -9,8 +9,13 @@ import 'package:mobile/features/auth/repository/authRepository.dart';
 import 'package:mobile/features/auth/screen/forgot_password.dart';
 import 'package:mobile/features/auth/screen/signUp.dart';
 import 'package:mobile/features/main/bottom_navigation_bar.dart';
+import 'package:mobile/features/main/repository/user_repository.dart';
+import 'package:mobile/features/main/screen/create_update_profile_screen.dart';
+import 'package:mobile/features/offline_screen/no_internet.dart';
 import 'package:mobile/network/apiClient.dart';
+import 'package:mobile/network/api_error_handler.dart';
 import 'package:mobile/shared/widgets/appButton.dart';
+import 'package:mobile/shared/widgets/appDialog.dart';
 import 'package:mobile/shared/widgets/appTextField.dart';
 import 'package:mobile/shared/widgets/appToast.dart';
 import 'package:mobile/shared/widgets/textButton.dart';
@@ -27,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final ApiClient _apiClient = ApiClient();
   late final AuthRepository _authRepository;
+  late final UserRepository _userRepository;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -38,6 +44,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     _authRepository = AuthRepository(_apiClient);
+    _userRepository = UserRepository(_apiClient);
+    _loadRememberedCredentials();
   }
 
   @override
@@ -47,10 +55,29 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _loadRememberedCredentials();
+  Future<void> _showCreateProfileDialog() async {
+    final shouldCreate = await AppDialog.warning(
+      context: context,
+      title: 'Complete Your Profile',
+      message:
+          'Your profile has not been set up yet. '
+          'Would you like to create your profile now?',
+      cancelText: 'Later',
+      confirmText: 'Create Profile',
+      barrierDismissible: false,
+    );
+
+    if (!mounted) return;
+
+    if (shouldCreate == true) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const CreateUpdateProfileScreen()),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
+    }
   }
 
   Future<void> handleGoogleLogin() async {
@@ -86,12 +113,12 @@ class _LoginScreenState extends State<LoginScreen> {
       SecureStorage.saveRefreshToken(response.refreshToken);
       SecureStorage.saveExpiresIn(response.expiresIn);
 
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (context) => const MainScreen()));
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
     } catch (e) {
       debugPrint('Google Sign-In failed: $e');
-      AppToast.error(e.toString());
+      AppToast.error(ApiErrorHandler.getMessage(e));
     }
   }
 
@@ -100,11 +127,15 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = await SecureStorage.getSavedEmail();
     final password = await SecureStorage.getSavedPassword();
 
-    if (mounted && rememberMe && email != null && password != null) {
+    if (mounted && rememberMe) {
       setState(() {
         _rememberMe = rememberMe;
-        _emailController.text = email;
-        _passwordController.text = password;
+        if (_emailController.text.isEmpty && email != null) {
+          _emailController.text = email;
+        }
+        if (_passwordController.text.isEmpty && password != null) {
+          _passwordController.text = password;
+        }
       });
     }
   }
@@ -123,10 +154,9 @@ class _LoginScreenState extends State<LoginScreen> {
     FocusScope.of(context).unfocus();
 
     if (_formKey.currentState!.validate()) {
-      // Backend login API will come here.
       final request = LoginRequest(
         email: _emailController.text.trim(),
-        password: _passwordController.text,
+        password: _passwordController.text.trim(),
       );
 
       try {
@@ -136,21 +166,35 @@ class _LoginScreenState extends State<LoginScreen> {
 
         AppToast.success('Login successful');
 
-        debugPrint('Login successful');
-        SecureStorage.saveIsLoggedIn(true);
-        SecureStorage.saveAccessToken(response.accessToken);
-        SecureStorage.saveTokenType(response.tokenType);
-        SecureStorage.saveRefreshToken(response.refreshToken);
-        SecureStorage.saveExpiresIn(response.expiresIn);
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (context) => const MainScreen()));
+        await _saveRememberedCredentials();
+        await SecureStorage.saveIsLoggedIn(true);
+        await SecureStorage.saveAccessToken(response.accessToken);
+        await SecureStorage.saveTokenType(response.tokenType);
+        await SecureStorage.saveRefreshToken(response.refreshToken);
+        await SecureStorage.saveExpiresIn(response.expiresIn);
+
+        try {
+          final userProfile = await _userRepository.getMyProfile();
+          if (!mounted) return;
+
+          if (userProfile == null) {
+            _showCreateProfileDialog();
+          } else {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const MainScreen()),
+            );
+          }
+        } catch (_) {
+          if (!mounted) return;
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+        }
       } catch (e) {
         if (!mounted) return;
 
         debugPrint('Login error: $e');
-
-        AppToast.error(e.toString());
+        AppToast.error(ApiErrorHandler.getMessage(e));
       }
     }
   }

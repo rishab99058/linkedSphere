@@ -6,6 +6,7 @@ import 'package:mobile/features/auth/model/forgot_password_request.dart';
 import 'package:mobile/features/auth/repository/authRepository.dart';
 import 'package:mobile/features/auth/screen/change_password.dart';
 import 'package:mobile/network/apiClient.dart';
+import 'package:mobile/network/api_error_handler.dart';
 import 'package:mobile/shared/widgets/appButton.dart';
 import 'package:mobile/shared/widgets/appToast.dart';
 import 'package:mobile/shared/widgets/textButton.dart';
@@ -92,7 +93,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     } catch (e) {
       if (!mounted) return;
       debugPrint('Error: $e');
-      AppToast.error(e.toString());
+      AppToast.error(ApiErrorHandler.getMessage(e));
     }
   }
 

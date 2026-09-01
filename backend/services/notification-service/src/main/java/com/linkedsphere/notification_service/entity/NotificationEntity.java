@@ -1,5 +1,6 @@
 package com.linkedsphere.notification_service.entity;
 
+import com.linkedsphere.notification_service.enums.DevicePlatform;
 import com.linksphere.common.entity.BaseEntity;
 import com.linksphere.common.enums.NotificationType;
 import jakarta.persistence.*;
@@ -23,6 +24,10 @@ public class NotificationEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private NotificationType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "platform", nullable = false, length = 20)
+    private DevicePlatform platform;
 
     @Column(name = "recipient_id", nullable = false)
     private UUID recipientId;

@@ -7,6 +7,7 @@ import 'package:mobile/features/auth/model/change_password_respose.dart';
 import 'package:mobile/features/auth/repository/authRepository.dart';
 import 'package:mobile/features/auth/screen/login.dart';
 import 'package:mobile/network/apiClient.dart';
+import 'package:mobile/network/api_error_handler.dart';
 import 'package:mobile/shared/widgets/appButton.dart';
 import 'package:mobile/shared/widgets/appTextField.dart';
 import 'package:mobile/shared/widgets/appToast.dart';
@@ -47,6 +48,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   }
 
   Future<void> _changePassword() async {
+    FocusScope.of(context).unfocus();
+
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     ChangePasswordRequest req = ChangePasswordRequest(
       email: widget.email,
       otp: widget.token,
@@ -60,13 +67,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         ChangePasswordResponse res = response;
         if (!mounted) return;
         AppToast.success(res.message);
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (context) => LoginScreen()));
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false,
+        );
       }
     } catch (e) {
       debugPrint('Failed to change password: ${e.toString()}');
-      AppToast.error(e.toString());
+      if (!mounted) return;
+      AppToast.error(ApiErrorHandler.getMessage(e));
     }
   }
 

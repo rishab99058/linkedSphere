@@ -15,4 +15,15 @@ class ApiEndpoints {
 
   // Health
   static String health() => '/actuator/health';
+
+  // User Endpoint
+  static const String _userPrefix = '/users';
+
+  static String getMyProfile() => '$_userPrefix/api/v1/users/get_my_profile';
+  static String createMyProfile() => '$_userPrefix/api/v1/users/create_my_profile';
+  static String updateMyProfile() => '$_userPrefix/api/v1/users/update_my_profile';
+  static String getProfile(String userId) =>
+      '$_userPrefix/api/v1/users/get_profile?user_id=$userId';
+
+  static String uploadFiles() => '$_userPrefix/files/upload';
 }

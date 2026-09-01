@@ -9,6 +9,7 @@ import 'package:mobile/features/auth/repository/authRepository.dart';
 import 'package:mobile/features/auth/screen/login.dart';
 import 'package:mobile/features/main/bottom_navigation_bar.dart';
 import 'package:mobile/network/apiClient.dart';
+import 'package:mobile/network/api_error_handler.dart';
 import 'package:mobile/shared/widgets/appButton.dart';
 import 'package:mobile/shared/widgets/appTextField.dart';
 import 'package:mobile/shared/widgets/appToast.dart';
@@ -89,7 +90,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ).push(MaterialPageRoute(builder: (context) => const MainScreen()));
     } catch (e) {
       debugPrint('Google Sign-In failed: $e');
-      AppToast.error(e.toString());
+      AppToast.error(ApiErrorHandler.getMessage(e));
     }
   }
 
@@ -97,7 +98,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     FocusScope.of(context).unfocus();
 
     if (_formKey.currentState!.validate()) {
-      // Backend login API will come here.
       try {
         final request = SigninRequest(
           email: emailController.text,
@@ -113,7 +113,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       } catch (e) {
         if (!mounted) return;
         debugPrint('SignUp error: $e');
-        AppToast.error(e.toString());
+        AppToast.error(ApiErrorHandler.getMessage(e));
       }
     }
   }
