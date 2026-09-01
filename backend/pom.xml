@@ -48,6 +48,7 @@
         <module>services/user-service</module>
         <module>services/discovery-server</module>
         <module>services/notification-service</module>
+        <module>services/post-service</module>
     </modules>
 
     <dependencyManagement>

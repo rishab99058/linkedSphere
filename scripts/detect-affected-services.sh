@@ -99,7 +99,8 @@ if [[ "$parent_changed" == true ]]; then
         user-service \
         notification-service \
         gateway-service \
-        discovery-server
+        discovery-server \
+        post-service
     do
 
         case ",$services," in
