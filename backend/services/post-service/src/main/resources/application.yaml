@@ -5,4 +5,4 @@ spring:
     discovery:
       enabled: true
   profiles:
-    active: local
+    active: dev
