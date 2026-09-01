@@ -29,7 +29,7 @@ RUN --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline
 COPY modules/common/src modules/common/src/
 COPY services/post-service/src services/post-service/src/
 
-# Build post-service and required modules
+# Build user-service and required modules
 RUN --mount=type=cache,target=/root/.m2 ./mvnw clean package \
     -pl services/post-service \
     -am \
@@ -44,6 +44,6 @@ COPY --from=builder \
     /opt/app/services/post-service/target/post-service-0.0.1-SNAPSHOT.jar \
     app.jar
 
-EXPOSE 8001
+EXPOSE 8009
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
