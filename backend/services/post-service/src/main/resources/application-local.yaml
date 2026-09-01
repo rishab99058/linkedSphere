@@ -19,7 +19,8 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb+srv://rishab99058_db_user:0Qn6ffhVu0KZM5kf@cluster1.7kenqxn.mongodb.net/
+      uri: mongodb+srv://rishab99058_db_user:0Qn6ffhVu0KZM5kf@cluster1.7kenqxn.mongodb.net/post_service?retryWrites=true&w=majority
+      database: post_service
     redis:
       host: known-doe-132811.upstash.io
       port: 6379
