@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:8001}
+  port: 8009
   servlet:
     context-path: /post
 
