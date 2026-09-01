@@ -20,17 +20,18 @@ COPY services/gateway-service/pom.xml services/gateway-service/
 COPY services/user-service/pom.xml services/user-service/
 COPY services/discovery-server/pom.xml services/discovery-server/
 COPY services/notification-service/pom.xml services/notification-service/
+COPY services/post-service/pom.xml services/post-service/
 
 # Download dependencies
 RUN --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline
 
 # Copy required source
 COPY modules/common/src modules/common/src/
-COPY services/user-service/src services/user-service/src/
+COPY services/post-service/src services/post-service/src/
 
-# Build user-service and required modules
+# Build post-service and required modules
 RUN --mount=type=cache,target=/root/.m2 ./mvnw clean package \
-    -pl services/user-service \
+    -pl services/post-service \
     -am \
     -DskipTests
 
@@ -40,9 +41,9 @@ FROM eclipse-temurin:21-jre
 WORKDIR /opt/app
 
 COPY --from=builder \
-    /opt/app/services/user-service/target/user-service-0.0.1-SNAPSHOT.jar \
+    /opt/app/services/post-service/target/post-service-0.0.1-SNAPSHOT.jar \
     app.jar
 
-EXPOSE 7999
+EXPOSE 8001
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
