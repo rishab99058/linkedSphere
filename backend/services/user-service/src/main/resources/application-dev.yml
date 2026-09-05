@@ -61,3 +61,8 @@ imagekit:
   public-key: public_RKLdGzOd0r27S2eOEwb0UjxDvXE=
   private-key: private_VHI4gkUX6c3PHZEl/+aOkBDB+yQ=
   url-endpoint: https://ik.imagekit.io/b4eam6xij
+
+neo4j:
+  uri: neo4j+s://7af93226.databases.neo4j.io
+  username: 7af93226
+  password: 1BejRDezBVrewqXy7D9BDsRJEo72G0eL5DzuVWRZZaE

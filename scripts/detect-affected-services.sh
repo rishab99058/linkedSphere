@@ -68,7 +68,8 @@ if [[ "$common_changed" == true ]]; then
     for service in \
         auth-service \
         user-service \
-        notification-service
+        notification-service \
+        post-service
     do
 
         case ",$services," in
@@ -99,7 +100,8 @@ if [[ "$parent_changed" == true ]]; then
         user-service \
         notification-service \
         gateway-service \
-        discovery-server
+        discovery-server \
+        post-service
     do
 
         case ",$services," in

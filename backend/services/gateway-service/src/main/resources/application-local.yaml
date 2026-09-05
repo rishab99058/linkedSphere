@@ -43,3 +43,8 @@ spring:
           uri: lb://notification-service
           predicates:
             - Path=/notifications/**
+
+        - id: post-service
+          uri: lb://post-service
+          predicates:
+            - Path=/posts/**

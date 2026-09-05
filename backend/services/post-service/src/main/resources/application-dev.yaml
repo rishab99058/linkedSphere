@@ -1,0 +1,52 @@
+server:
+  port: ${PORT:8009}
+  servlet:
+    context-path: /post
+
+eureka:
+  client:
+    service-url:
+      defaultZone: https://linksphere-discovery-server-190262577212.asia-south2.run.app/eureka/
+  instance:
+    prefer-ip-address: false
+    hostname: ${SERVICE_HOSTNAME}
+    secure-port-enabled: true
+    secure-port: 443
+    non-secure-port-enabled: false
+
+spring:
+  rabbitmq:
+    host: warthog.lmq.cloudamqp.com
+    port: 5671
+    username: bepmlbwp
+    virtual-host: bepmlbwp
+    password: SRzPZy6UL8ZtZLfONaGd9rjj4K64PYHl
+    ssl:
+      enabled: true
+
+  data:
+    mongodb:
+      uri: mongodb+srv://rishab99058_db_user:0Qn6ffhVu0KZM5kf@cluster1.7kenqxn.mongodb.net/
+    redis:
+      host: known-doe-132811.upstash.io
+      port: 6379
+      username: default
+      password: gQAAAAAAAgbLAAIgcDIzYTYyYjY3ZTI1NzI0OGJiODYzMTdiYTQ0OGFjZDM1Ng
+      ssl:
+        enabled: true
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+
+jwt:
+  secret: "0f6a9a5e2c5b4d8f3a2b7c9d1e4f6a8b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5"
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000
+  issuer: "linksphere-auth-service"
+
+imagekit:
+  public-key: public_RKLdGzOd0r27S2eOEwb0UjxDvXE=
+  private-key: private_VHI4gkUX6c3PHZEl/+aOkBDB+yQ=
+  url-endpoint: https://ik.imagekit.io/b4eam6xij

@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: post-service
+  cloud:
+    discovery:
+      enabled: true
+  profiles:
+    active: dev
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

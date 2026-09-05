@@ -200,6 +200,25 @@ jobs:
             backend
 
       # =========================================================
+      # POST SERVICE
+      # =========================================================
+
+      - name: Build Post Service Image
+        if: contains(steps.affected.outputs.affected_services, 'post-service')
+        run: |
+          echo "======================================"
+          echo "Building post-service"
+          echo "Platform: linux/amd64"
+          echo "======================================"
+
+          docker buildx build \
+            --platform linux/amd64 \
+            -f backend/services/post-service/Dockerfile \
+            -t "linksphere/post-service:${GITHUB_SHA}" \
+            --load \
+            backend
+
+      # =========================================================
       # VERIFY IMAGES
       # =========================================================
 
@@ -315,6 +334,24 @@ jobs:
 
           docker push \
             "ghcr.io/${{ github.repository_owner }}/linksphere-notification-service:${GITHUB_SHA}"
+
+      # =========================================================
+      # PUSH POST SERVICE TO GHCR
+      # =========================================================
+
+      - name: Push Post Service Image to GHCR
+        if: contains(steps.affected.outputs.affected_services, 'post-service')
+        run: |
+          echo "======================================"
+          echo "Pushing post-service to GHCR"
+          echo "======================================"
+
+          docker tag \
+            "linksphere/post-service:${GITHUB_SHA}" \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-post-service:${GITHUB_SHA}"
+
+          docker push \
+            "ghcr.io/${{ github.repository_owner }}/linksphere-post-service:${GITHUB_SHA}"
 
       # =========================================================
       # AUTHETICATE TO GOOGLE CLOUD

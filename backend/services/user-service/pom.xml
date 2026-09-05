@@ -30,9 +30,13 @@
         <!-- ==================== Spring Boot ==================== -->
 
         <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-</dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -146,6 +150,18 @@
 <dependency>
     <groupId>io.github.resilience4j</groupId>
     <artifactId>resilience4j-spring-boot3</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.neo4j.driver</groupId>
+    <artifactId>neo4j-java-driver</artifactId>
+    <version>6.1.0</version>
+</dependency>
+
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp</artifactId>
 </dependency>
 
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "538739406225",
+    "project_id": "linkedsphere-dev",
+    "storage_bucket": "linkedsphere-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:538739406225:android:d33e8c50181519a3f4d630",
+        "android_client_info": {
+          "package_name": "com.linksphere.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4udCWwnWtf3lFg_1Zdp3bALYKeIHP8cQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
