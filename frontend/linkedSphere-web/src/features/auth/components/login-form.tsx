@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { z } from "zod";
 import { Eye, EyeOff } from "lucide-react";
-import { setAccessToken, removeAccessToken, setRefreshToken } from "@/lib/auth-storage";
+import {
+  setAccessToken,
+  removeAccessToken,
+  setRefreshToken,
+} from "@/lib/auth-storage";
 import { loginUser, getUserProfile } from "../api/auth-api";
 import { useNavigate } from "react-router-dom";
-
-
-
 
 const loginSchema = z.object({
   email: z
@@ -24,6 +25,7 @@ const loginSchema = z.object({
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
+
 type LoginFormErrors = Partial<
   Record<keyof LoginFormValues, string>
 >;
@@ -36,149 +38,158 @@ function LoginForm() {
     password: "",
   });
 
-
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  function handleChange(field: keyof LoginFormValues, value: string) {
+  function handleChange(
+    field: keyof LoginFormValues,
+    value: string,
+  ) {
     setFormData((previousData) => ({
       ...previousData,
       [field]: value,
     }));
+
     setErrors((previousErrors) => ({
       ...previousErrors,
       [field]: undefined,
     }));
+
     setApiError("");
     setIsSuccess(false);
   }
 
-async function handleSubmit(
-  event: React.FormEvent<HTMLFormElement>,
-) {
-  event.preventDefault();
+  async function handleSubmit(
+    event: React.FormEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
 
-  setApiError("");
-  setIsSuccess(false);
+    setApiError("");
+    setIsSuccess(false);
 
-  const result = loginSchema.safeParse(formData);
+    const result = loginSchema.safeParse(formData);
 
-  if (!result.success) {
-    const fieldErrors = result.error.flatten().fieldErrors;
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
 
-    const nextErrors: LoginFormErrors = {};
+      const nextErrors: LoginFormErrors = {};
 
-    (Object.keys(formData) as Array<keyof LoginFormValues>).forEach(
-      (field) => {
+      (
+        Object.keys(formData) as Array<
+          keyof LoginFormValues
+        >
+      ).forEach((field) => {
         const message = fieldErrors[field]?.[0];
 
         if (message) {
           nextErrors[field] = message;
         }
-      },
-    );
+      });
 
-    setErrors(nextErrors);
-    return;
-  }
-
-  setErrors({});
-  setIsLoading(true);
-  removeAccessToken();
-
-  try {
-    //Login
-    const loginResponse = await loginUser({
-      email: result.data.email,
-      password: result.data.password,
-    });
-
-    console.log(
-      "Login status:",
-      loginResponse.status,
-    );
-
-    console.log(
-      "Login response:",
-      loginResponse.data,
-    );
-
-    //Get token
-    const accessToken =
-      loginResponse.data?.accessToken;
-
-    const refreshToken =
-      loginResponse.data?.refreshToken;
-
-    if (!accessToken) {
-      setApiError(
-        "Login succeeded but access token was not returned.",
-      );
+      setErrors(nextErrors);
       return;
     }
 
-    //Store token
-    setAccessToken(accessToken);
+    setErrors({});
+    setIsLoading(true);
+    removeAccessToken();
 
-    if (refreshToken) {
-      setRefreshToken(refreshToken);
-    }
-
-    //Call protected API
     try {
-      const profileResponse =
-        await getUserProfile();
-
-      console.log(
-        "Profile status:",
-        profileResponse.status,
-      );
-
-      console.log(
-        "Profile response:",
-        profileResponse.data,
-      );
-
-      navigate("/home", {
-        replace: true,
+      // Login
+      const loginResponse = await loginUser({
+        email: result.data.email,
+        password: result.data.password,
       });
 
-      setIsSuccess(true);
+      console.log(
+        "Login status:",
+        loginResponse.status,
+      );
 
-    } catch (profileError) {
+      console.log(
+        "Login response:",
+        loginResponse.data,
+      );
+
+      // Get token
+      const accessToken =
+        loginResponse.data?.accessToken;
+
+      const refreshToken =
+        loginResponse.data?.refreshToken;
+
+      if (!accessToken) {
+        setApiError(
+          "Login succeeded but access token was not returned.",
+        );
+        return;
+      }
+
+      // Store token
+      setAccessToken(accessToken);
+
+      if (refreshToken) {
+        setRefreshToken(refreshToken);
+      }
+
+      // Call protected API
+      try {
+        const profileResponse =
+          await getUserProfile();
+
+        console.log(
+          "Profile status:",
+          profileResponse.status,
+        );
+
+        console.log(
+          "Profile response:",
+          profileResponse.data,
+        );
+
+        navigate("/home", {
+          replace: true,
+        });
+
+        setIsSuccess(true);
+      } catch (profileError) {
+        console.error(
+          "Profile request failed:",
+          profileError,
+        );
+
+        setApiError(
+          "Login succeeded, but profile could not be loaded.",
+        );
+      }
+    } catch (loginError) {
       console.error(
-        "Profile request failed:",
-        profileError,
+        "Login failed:",
+        loginError,
       );
 
       setApiError(
-        "Login succeeded, but profile could not be loaded.",
+        "Invalid email or password. Please try again.",
       );
+    } finally {
+      setIsLoading(false);
     }
-
-  } catch (loginError) {
-    console.error(
-      "Login failed:",
-      loginError,
-    );
-
-    setApiError(
-      "Invalid email or password. Please try again.",
-    );
-  } finally {
-    setIsLoading(false);
   }
-}
 
-
- return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {/* EMAIL */}
-      <div className="space-y-2">
-        <Label htmlFor="email">
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="w-full space-y-6"
+    >
+      {/* ==================== EMAIL ==================== */}
+      <div className="space-y-2.5">
+        <Label
+          htmlFor="email"
+          className="text-sm font-semibold text-slate-900"
+        >
           Email
         </Label>
 
@@ -187,24 +198,43 @@ async function handleSubmit(
           name="email"
           type="email"
           placeholder="Enter your email"
-          autoComplete="email"
+          autoComplete="off"
           value={formData.email}
           onChange={(event) =>
-            handleChange("email", event.target.value)
+            handleChange(
+              "email",
+              event.target.value,
+            )
           }
           aria-invalid={Boolean(errors.email)}
+          aria-describedby={
+            errors.email
+              ? "email-error"
+              : undefined
+          }
+          className={`h-11 rounded-lg border-slate-300 bg-white px-3.5 text-sm transition-all placeholder:text-slate-400 focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500/20 ${
+            errors.email
+              ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20"
+              : ""
+          }`}
         />
 
-        {errors.email ? (
-          <p className="text-sm text-red-500">
+        {errors.email && (
+          <p
+            id="email-error"
+            className="text-xs font-medium text-red-500"
+          >
             {errors.email}
           </p>
-        ) : null}
+        )}
       </div>
 
-      {/* PASSWORD */}
-      <div className="space-y-2">
-        <Label htmlFor="password">
+      {/* ==================== PASSWORD ==================== */}
+      <div className="space-y-2.5">
+        <Label
+          htmlFor="password"
+          className="text-sm font-semibold text-slate-900"
+        >
           Password
         </Label>
 
@@ -212,24 +242,42 @@ async function handleSubmit(
           <Input
             id="password"
             name="password"
-            type={showPassword ? "text" : "password"}
+            type={
+              showPassword
+                ? "text"
+                : "password"
+            }
             placeholder="Enter your password"
             autoComplete="current-password"
             value={formData.password}
             onChange={(event) =>
-              handleChange("password", event.target.value)
+              handleChange(
+                "password",
+                event.target.value,
+              )
             }
             aria-invalid={Boolean(errors.password)}
-            className="pr-10"
+            aria-describedby={
+              errors.password
+                ? "password-error"
+                : undefined
+            }
+            className={`h-11 rounded-lg border-slate-300 bg-white px-3.5 pr-11 text-sm transition-all placeholder:text-slate-400 focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500/20 ${
+              errors.password
+                ? "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20"
+                : ""
+            }`}
           />
 
           {formData.password.length > 0 && (
             <button
               type="button"
               onClick={() =>
-                setShowPassword((previous) => !previous)
+                setShowPassword(
+                  (previous) => !previous,
+                )
               }
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+              className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               aria-label={
                 showPassword
                   ? "Hide password"
@@ -245,34 +293,55 @@ async function handleSubmit(
           )}
         </div>
 
-        {errors.password ? (
-          <p className="text-sm text-red-500">
+        {errors.password && (
+          <p
+            id="password-error"
+            className="text-xs font-medium text-red-500"
+          >
             {errors.password}
           </p>
-        ) : null}
+        )}
       </div>
 
-      {/* API ERROR */}
-      {apiError ? (
-        <p className="text-center text-sm text-red-500">
-          {apiError}
-        </p>
-      ) : null}
+      {/* ==================== FORGOT PASSWORD ==================== */}
+      <div className="-mt-1 flex justify-end">
+        <button
+          type="button"
+          onClick={() =>
+            navigate("/auth/forgot-password")
+          }
+          className="text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+        >
+          Forgot Password?
+        </button>
+      </div>
 
-      {/* SUCCESS */}
-      {isSuccess ? (
-        <p className="text-center text-sm font-medium text-green-600">
-          Login successful!
-        </p>
-      ) : null}
+      {/* ==================== API ERROR / SUCCESS ==================== */}
+      {(apiError || isSuccess) && (
+        <div className="min-h-5">
+          {apiError && (
+            <p className="rounded-md bg-red-50 px-3 py-2 text-center text-sm font-medium text-red-600">
+              {apiError}
+            </p>
+          )}
 
-      {/* LOGIN BUTTON */}
+          {isSuccess && (
+            <p className="rounded-md bg-green-50 px-3 py-2 text-center text-sm font-medium text-green-600">
+              Login successful!
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* ==================== LOGIN BUTTON ==================== */}
       <Button
         type="submit"
-        className="w-full"
         disabled={isLoading}
+        className="h-11 w-full rounded-lg bg-blue-600 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isLoading ? "Signing in..." : "Login"}
+        {isLoading
+          ? "Signing in..."
+          : "Login"}
       </Button>
     </form>
   );

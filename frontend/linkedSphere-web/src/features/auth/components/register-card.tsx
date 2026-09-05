@@ -6,7 +6,7 @@ import {
 import BrandSection from "./brand-section";
 import RegisterHeader from "./register-header";
 import RegisterForm from "./register-form";
-import SocialRegister from "./social-register";
+// import SocialRegister from "./register-social";
 import LoginSection from "./login-section";
 
 function RegisterCard() {
@@ -16,7 +16,7 @@ function RegisterCard() {
         <BrandSection />
         <RegisterHeader />
         <RegisterForm />
-        <SocialRegister />
+        {/* <SocialRegister /> */}
         <LoginSection />
       </CardContent>
     </Card>
