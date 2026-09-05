@@ -2,6 +2,7 @@
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/config/GoogleOAuthConfig.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/config/SecurityConfig.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/controller/AuthController.java
+/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/controller/HealthController.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/controller/ProfileController.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/controller/RabbitMQTestController.java
 /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/auth-service/src/main/java/com/linksphere/auth_service/dto/request/ForgotPasswordRequest.java

@@ -73,7 +73,17 @@ public enum ErrorCode {
         PROFILE_NOT_FOUND(
                         "PROFILE_NOT_FOUND",
                         "Profile has not been set up",
-                        HttpStatus.NOT_FOUND);
+                        HttpStatus.NOT_FOUND),
+
+        SELF_CONNECTION_REQUEST(
+                        "SELF_CONNECTION_REQUEST",
+                        "You cannot send connection request to yourself",
+                        HttpStatus.BAD_REQUEST),
+
+        ALREADY_CONNECTED(
+                        "ALREADY_CONNECTED",
+                        "Already connected",
+                        HttpStatus.BAD_REQUEST);
 
         private final String code;
 

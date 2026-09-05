@@ -69,3 +69,9 @@ jwt:
 google:
   oauth:
     client-ids: "190262577212-mkpofmng8u4csgijo38s0ev8fs2j6jmc.apps.googleusercontent.com"
+
+neo4j:
+  uri: neo4j+s://7af93226.databases.neo4j.io
+  username: 7af93226
+  password: 1BejRDezBVrewqXy7D9BDsRJEo72G0eL5DzuVWRZZaE
+  database: 7af93226

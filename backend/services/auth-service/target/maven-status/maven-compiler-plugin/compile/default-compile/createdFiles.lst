@@ -24,6 +24,7 @@ com/linksphere/auth_service/entity/UserEntity.class
 com/linksphere/auth_service/service/impl/AuthServiceImpl.class
 com/linksphere/auth_service/security/jwt/JwtAutheticationFilter.class
 com/linksphere/auth_service/entity/RoleEntity.class
+com/linksphere/auth_service/controller/HealthController.class
 com/linksphere/auth_service/dto/response/LoginResponse$LoginResponseBuilder.class
 com/linksphere/auth_service/dto/response/ForgotPasswordRespose.class
 com/linksphere/auth_service/repository/PasswordResetOtpEntityRepository.class
