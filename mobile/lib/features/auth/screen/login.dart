@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/core/colors.dart';
 import 'package:mobile/core/costants.dart';
 import 'package:mobile/core/google_service_auth.dart';
@@ -16,29 +17,30 @@ import 'package:mobile/shared/widgets/appToast.dart';
 import 'package:mobile/shared/widgets/textButton.dart';
 import 'package:mobile/storage/secure_storage.dart';
 
-class LoginScreen extends StatefulWidget {
+final apiClientProvider = Provider<ApiClient>((ref) {
+  return ApiClient();
+});
+
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return AuthRepository(apiClient);
+});
+
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final ApiClient _apiClient = ApiClient();
-  late final AuthRepository _authRepository;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _rememberMe = false;
   bool _isObscure = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _authRepository = AuthRepository(_apiClient);
-  }
 
   @override
   void dispose() {
@@ -72,7 +74,8 @@ class _LoginScreenState extends State<LoginScreen> {
       debugPrint('Google ID Token received: $idToken');
 
       final request = GoogleSignInRequest(idToken: idToken);
-      final response = await _authRepository.googleLogin(request);
+      final authRepository = ref.read(authRepositoryProvider);
+      final response = await authRepository.googleLogin(request);
       if (!mounted) return;
       AppToast.success('Login successful');
       debugPrint('Login successful');
@@ -80,15 +83,19 @@ class _LoginScreenState extends State<LoginScreen> {
       debugPrint(response.tokenType);
       debugPrint(response.refreshToken);
       debugPrint(response.expiresIn.toString());
-      SecureStorage.saveIsLoggedIn(true);
-      SecureStorage.saveAccessToken(response.accessToken);
-      SecureStorage.saveTokenType(response.tokenType);
-      SecureStorage.saveRefreshToken(response.refreshToken);
-      SecureStorage.saveExpiresIn(response.expiresIn);
+      await SecureStorage.saveIsLoggedIn(true);
+      await SecureStorage.saveAccessToken(response.accessToken);
+      await SecureStorage.saveTokenType(response.tokenType);
+      await SecureStorage.saveRefreshToken(response.refreshToken);
+      await SecureStorage.saveExpiresIn(response.expiresIn);
+      await SecureStorage.saveIsFirstLaunch(false);
 
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (context) => const MainScreen()));
+      if (!mounted) return;
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+        (route) => false,
+      );
     } catch (e) {
       debugPrint('Google Sign-In failed: $e');
       AppToast.error(e.toString());
@@ -123,28 +130,33 @@ class _LoginScreenState extends State<LoginScreen> {
     FocusScope.of(context).unfocus();
 
     if (_formKey.currentState!.validate()) {
-      // Backend login API will come here.
       final request = LoginRequest(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
       try {
-        final response = await _authRepository.login(request);
+        final authRepository = ref.read(authRepositoryProvider);
+        final response = await authRepository.login(request);
 
         if (!mounted) return;
 
         AppToast.success('Login successful');
 
         debugPrint('Login successful');
-        SecureStorage.saveIsLoggedIn(true);
-        SecureStorage.saveAccessToken(response.accessToken);
-        SecureStorage.saveTokenType(response.tokenType);
-        SecureStorage.saveRefreshToken(response.refreshToken);
-        SecureStorage.saveExpiresIn(response.expiresIn);
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (context) => const MainScreen()));
+        await SecureStorage.saveIsLoggedIn(true);
+        await SecureStorage.saveAccessToken(response.accessToken);
+        await SecureStorage.saveTokenType(response.tokenType);
+        await SecureStorage.saveRefreshToken(response.refreshToken);
+        await SecureStorage.saveExpiresIn(response.expiresIn);
+        await SecureStorage.saveIsFirstLaunch(false);
+
+        if (!mounted) return;
+
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+          (route) => false,
+        );
       } catch (e) {
         if (!mounted) return;
 

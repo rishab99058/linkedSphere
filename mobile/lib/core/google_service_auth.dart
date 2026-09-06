@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class GoogleAuthService {
@@ -16,8 +17,8 @@ class GoogleAuthService {
     try {
       return await _googleSignIn.authenticate();
     } on GoogleSignInException catch (e) {
-      print('Google Sign-In failed: ${e.code}');
-      print(e.description);
+      debugPrint('Google Sign-In failed: ${e.code}');
+      debugPrint(e.description);
       rethrow;
     }
   }
