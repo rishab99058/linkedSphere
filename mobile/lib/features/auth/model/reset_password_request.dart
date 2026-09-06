@@ -10,8 +10,8 @@ class ResetPasswordRequest {
   });
 
   Map<String, dynamic> toJson() => {
-        'email': email,
-        'otp': otp,
-        'password': password,
-      };
+    'email': email,
+    'otp': otp,
+    'password': password,
+  };
 }

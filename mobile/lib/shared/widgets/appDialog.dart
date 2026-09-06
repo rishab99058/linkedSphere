@@ -27,7 +27,8 @@ class AppAwesomeDialog {
     bool dismissOnBackKeyPress = true,
     Function(DismissType type)? onDismissCallback,
   }) {
-    final headerWidget = customHeader ?? _buildHeader(dialogType, icon, iconColor);
+    final headerWidget =
+        customHeader ?? _buildHeader(dialogType, icon, iconColor);
 
     final dialog = AwesomeDialog(
       context: context,
@@ -123,13 +124,7 @@ class AppAwesomeDialog {
           width: 2,
         ),
       ),
-      child: Center(
-        child: Icon(
-          iconData,
-          size: 34,
-          color: effectiveIconColor,
-        ),
-      ),
+      child: Center(child: Icon(iconData, size: 34, color: effectiveIconColor)),
     );
   }
 

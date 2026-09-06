@@ -46,9 +46,7 @@ class ProfileRepository {
           path: ApiEndpoints.logout(),
           requiresAuth: false,
           responseType: ApiResponseType.text,
-          data: LogoutModel(
-            refreshToken: refreshToken,
-          ).toJson(),
+          data: LogoutModel(refreshToken: refreshToken).toJson(),
         );
       } catch (e) {
         // Backend error logged, client will still clear session
