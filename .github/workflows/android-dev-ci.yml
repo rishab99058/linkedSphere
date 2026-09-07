@@ -51,6 +51,11 @@ jobs:
                   flutter build apk \
                     --dart-define=ENV=dev
 
+            - name: Find generated APK
+              run: |
+                  echo "Generated APK files:"
+                  find build -type f -name "*.apk" -print
+
             - name: Upload APK to Firebase App Distribution
               uses: wzieba/Firebase-Distribution-Github-Action@v1
               with:
