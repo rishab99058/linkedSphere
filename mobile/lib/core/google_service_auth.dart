@@ -10,6 +10,8 @@ class GoogleAuthService {
     await _googleSignIn.initialize(
       clientId:
           '190262577212-mkpofmng8u4csgijo38s0ev8fs2j6jmc.apps.googleusercontent.com',
+      serverClientId:
+          '190262577212-mkpofmng8u4csgijo38s0ev8fs2j6jmc.apps.googleusercontent.com',
     );
   }
 
