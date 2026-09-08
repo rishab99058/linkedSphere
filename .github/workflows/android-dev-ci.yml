@@ -61,6 +61,6 @@ jobs:
               with:
                   appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
                   serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-                  file: build/app/outputs/flutter-apk/app-dev-release.apk
+                  file: build/app/outputs/flutter-apk/app-release.apk
                   groups: developers
                   releaseNotes: "DEV build from develop branch"
