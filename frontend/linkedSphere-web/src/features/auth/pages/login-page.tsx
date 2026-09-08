@@ -1,10 +1,10 @@
 import AuthLayout from "../components/auth-layout";
 import LoginCard from "../components/login-card";
 
-function LoginPage(){
+function LoginPage() {
   return (
     <AuthLayout>
-        <LoginCard/>
+      <LoginCard />
     </AuthLayout>
   );
 }
