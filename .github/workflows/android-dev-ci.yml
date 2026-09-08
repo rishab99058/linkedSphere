@@ -75,7 +75,6 @@ jobs:
       - name: Build DEV APK
         run: |
           flutter build apk \
-            --flavor dev \
             --dart-define=ENV=dev
 
       - name: Verify APK
