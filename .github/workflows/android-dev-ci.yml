@@ -49,7 +49,6 @@ jobs:
             - name: Build Android DEV APK
               run: |
                   flutter build apk \
-                    --flavor dev \
                     --dart-define=ENV=dev
 
             - name: Find generated APK
