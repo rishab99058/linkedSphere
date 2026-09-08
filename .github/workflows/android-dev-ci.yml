@@ -13,9 +13,9 @@ permissions:
   contents: read
 
 jobs:
+
   # ============================================================
   # CI
-  # Runs on Pull Requests and pushes to develop
   # ============================================================
   ci:
     name: Android CI
@@ -50,13 +50,10 @@ jobs:
 
   # ============================================================
   # CD
-  # Runs ONLY after code is pushed/merged into develop
   # ============================================================
   cd:
     name: Android DEV CD
     runs-on: ubuntu-latest
-
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
 
     defaults:
       run:
@@ -78,6 +75,7 @@ jobs:
       - name: Build DEV APK
         run: |
           flutter build apk \
+            --flavor dev \
             --dart-define=ENV=dev
 
       - name: Verify APK
@@ -95,6 +93,6 @@ jobs:
           releaseNotes: |
             LinkedSphere DEV build
 
-            Branch: develop
+            Branch: ${{ github.ref_name }}
             Commit: ${{ github.sha }}
             Build: ${{ github.run_number }}
