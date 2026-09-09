@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 
-function SocialRegister() {
+function SocialLogin() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <div className="h-px flex-1 bg-border" />
 
-        <span className="text-sm text-muted-foreground">
+        <span className="text-xs font-medium text-muted-foreground">
           OR
         </span>
 
@@ -16,14 +16,13 @@ function SocialRegister() {
       <Button
         type="button"
         variant="outline"
-        className="w-full"
+        className="h-11 w-full"
       >
-        <span className="font-semibold">G</span>
-
+        <span className="mr-2 text-base font-bold">G</span>
         Continue with Google
       </Button>
     </div>
   );
 }
 
-export default SocialRegister;
+export default SocialLogin;

@@ -1,278 +1,250 @@
+import { useState } from "react";
+import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { z } from "zod";
+
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { z } from "zod";
-import { Eye, EyeOff } from "lucide-react";
-import { setAccessToken, removeAccessToken, setRefreshToken } from "@/lib/auth-storage";
-import { loginUser, getUserProfile } from "../api/auth-api";
-import { useNavigate } from "react-router-dom";
 
+import { getUserProfile, loginUser } from "../api/auth-api";
 
-
+import {
+  removeAccessToken,
+  setAccessToken,
+  setRefreshToken,
+} from "@/lib/auth-storage";
 
 const loginSchema = z.object({
   email: z
     .string()
-    .trim()
     .min(1, "Email is required")
-    .email("Enter a valid email"),
+    .email("Enter a valid email address"),
 
-  password: z
-    .string()
-    .min(1, "Password is required"),
+  password: z.string().min(1, "Password is required"),
 });
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-type LoginFormErrors = Partial<
-  Record<keyof LoginFormValues, string>
->;
 
 function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [formData, setFormData] = useState<LoginFormValues>({
-    email: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-
-  const [errors, setErrors] = useState<LoginFormErrors>({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  function handleChange(field: keyof LoginFormValues, value: string) {
-    setFormData((previousData) => ({
-      ...previousData,
-      [field]: value,
-    }));
-    setErrors((previousErrors) => ({
-      ...previousErrors,
-      [field]: undefined,
-    }));
-    setApiError("");
-    setIsSuccess(false);
-  }
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
 
-async function handleSubmit(
-  event: React.FormEvent<HTMLFormElement>,
-) {
-  event.preventDefault();
+  const [serverError, setServerError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  setApiError("");
-  setIsSuccess(false);
+  const registrationSuccess = location.state?.registered === true;
 
-  const result = loginSchema.safeParse(formData);
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-  if (!result.success) {
-    const fieldErrors = result.error.flatten().fieldErrors;
-
-    const nextErrors: LoginFormErrors = {};
-
-    (Object.keys(formData) as Array<keyof LoginFormValues>).forEach(
-      (field) => {
-        const message = fieldErrors[field]?.[0];
-
-        if (message) {
-          nextErrors[field] = message;
-        }
-      },
-    );
-
-    setErrors(nextErrors);
-    return;
-  }
-
-  setErrors({});
-  setIsLoading(true);
-  removeAccessToken();
-
-  try {
-    //Login
-    const loginResponse = await loginUser({
-      email: result.data.email,
-      password: result.data.password,
+    const result = loginSchema.safeParse({
+      email,
+      password,
     });
 
-    console.log(
-      "Login status:",
-      loginResponse.status,
-    );
+    if (!result.success) {
+      const nextErrors: {
+        email?: string;
+        password?: string;
+      } = {};
 
-    console.log(
-      "Login response:",
-      loginResponse.data,
-    );
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as "email" | "password";
 
-    //Get token
-    const accessToken =
-      loginResponse.data?.accessToken;
+        if (!nextErrors[field]) {
+          nextErrors[field] = issue.message;
+        }
+      });
 
-    const refreshToken =
-      loginResponse.data?.refreshToken;
-
-    if (!accessToken) {
-      setApiError(
-        "Login succeeded but access token was not returned.",
-      );
+      setErrors(nextErrors);
       return;
     }
 
-    //Store token
-    setAccessToken(accessToken);
+    setErrors({});
+    setServerError("");
+    setIsLoading(true);
 
-    if (refreshToken) {
-      setRefreshToken(refreshToken);
-    }
-
-    //Call protected API
     try {
-      const profileResponse =
-        await getUserProfile();
+      removeAccessToken();
 
-      console.log(
-        "Profile status:",
-        profileResponse.status,
-      );
+      const response = await loginUser({
+        email,
+        password,
+      });
 
-      console.log(
-        "Profile response:",
-        profileResponse.data,
-      );
+      const { accessToken, refreshToken } = response.data;
+
+      setAccessToken(accessToken);
+      setRefreshToken(refreshToken);
+
+      await getUserProfile();
 
       navigate("/home", {
         replace: true,
       });
+    } catch (error: any) {
+      removeAccessToken();
 
-      setIsSuccess(true);
+      const status = error?.response?.status;
 
-    } catch (profileError) {
-      console.error(
-        "Profile request failed:",
-        profileError,
-      );
-
-      setApiError(
-        "Login succeeded, but profile could not be loaded.",
-      );
+      if (status === 401 || status === 403) {
+        setServerError("Invalid email or password.");
+      } else {
+        setServerError(
+          error?.response?.data?.message ??
+            "Unable to sign in. Please try again.",
+        );
+      }
+    } finally {
+      setIsLoading(false);
     }
-
-  } catch (loginError) {
-    console.error(
-      "Login failed:",
-      loginError,
-    );
-
-    setApiError(
-      "Invalid email or password. Please try again.",
-    );
-  } finally {
-    setIsLoading(false);
   }
-}
 
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+      {/* Registration success */}
+      {registrationSuccess && (
+        <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-3">
+          <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[11px] font-bold text-white">
+            ✓
+          </div>
 
- return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {/* EMAIL */}
+          <div>
+            <p className="text-sm font-semibold text-emerald-800">
+              Account created successfully
+            </p>
+
+            <p className="mt-0.5 text-xs leading-5 text-emerald-700">
+              Sign in to continue to LinkedSphere.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Email */}
       <div className="space-y-2">
-        <Label htmlFor="email">
-          Email
-        </Label>
-
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="Enter your email"
-          autoComplete="email"
-          value={formData.email}
-          onChange={(event) =>
-            handleChange("email", event.target.value)
-          }
-          aria-invalid={Boolean(errors.email)}
-        />
-
-        {errors.email ? (
-          <p className="text-sm text-red-500">
-            {errors.email}
-          </p>
-        ) : null}
-      </div>
-
-      {/* PASSWORD */}
-      <div className="space-y-2">
-        <Label htmlFor="password">
-          Password
+        <Label
+          htmlFor="login-email"
+          className="text-sm font-semibold text-slate-700"
+        >
+          Email address
         </Label>
 
         <div className="relative">
-          <Input
-            id="password"
-            name="password"
-            type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
-            autoComplete="current-password"
-            value={formData.password}
-            onChange={(event) =>
-              handleChange("password", event.target.value)
-            }
-            aria-invalid={Boolean(errors.password)}
-            className="pr-10"
+          <Mail
+            size={17}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
           />
 
-          {formData.password.length > 0 && (
-            <button
-              type="button"
-              onClick={() =>
-                setShowPassword((previous) => !previous)
-              }
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
-              aria-label={
-                showPassword
-                  ? "Hide password"
-                  : "Show password"
-              }
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </button>
-          )}
+          <Input
+            id="login-email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setServerError("");
+            }}
+            disabled={isLoading}
+            className={`h-12 rounded-xl border-slate-200 bg-white pl-10 text-sm shadow-sm transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 ${
+              errors.email ? "border-red-300 focus:border-red-400" : ""
+            }`}
+          />
         </div>
 
-        {errors.password ? (
-          <p className="text-sm text-red-500">
-            {errors.password}
+        {errors.email && (
+          <p className="text-xs font-medium text-destructive">
+            {errors.email}
           </p>
-        ) : null}
+        )}
       </div>
 
-      {/* API ERROR */}
-      {apiError ? (
-        <p className="text-center text-sm text-red-500">
-          {apiError}
-        </p>
-      ) : null}
+      {/* Password */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label
+            htmlFor="login-password"
+            className="text-sm font-semibold text-slate-700"
+          >
+            Password
+          </Label>
 
-      {/* SUCCESS */}
-      {isSuccess ? (
-        <p className="text-center text-sm font-medium text-green-600">
-          Login successful!
-        </p>
-      ) : null}
+          <Link
+            to="/auth/forgot-password"
+            className="text-xs font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
-      {/* LOGIN BUTTON */}
+        <div className="relative">
+          <LockKeyhole
+            size={17}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+          />
+
+          <Input
+            id="login-password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(event) => {
+              setPassword(event.target.value);
+              setServerError("");
+            }}
+            disabled={isLoading}
+            className={`h-12 rounded-xl border-slate-200 bg-white pl-10 pr-11 text-sm shadow-sm transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 ${
+              errors.password ? "border-red-300 focus:border-red-400" : ""
+            }`}
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword((previous) => !previous)}
+            disabled={isLoading}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition-colors hover:text-slate-700 disabled:pointer-events-none disabled:opacity-50"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+          </button>
+        </div>
+
+        {errors.password && (
+          <p className="text-xs font-medium text-destructive">
+            {errors.password}
+          </p>
+        )}
+      </div>
+
+      {/* Server error */}
+      {serverError && (
+        <div className="rounded-xl border border-red-200 bg-red-50/80 px-4 py-3">
+          <p className="text-sm font-medium leading-5 text-red-700">
+            {serverError}
+          </p>
+        </div>
+      )}
+
+      {/* Submit */}
       <Button
         type="submit"
-        className="w-full"
         disabled={isLoading}
+        className="group relative h-12 w-full overflow-hidden rounded-xl bg-slate-950 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-xl hover:shadow-blue-600/20 disabled:translate-y-0 disabled:opacity-70"
       >
-        {isLoading ? "Signing in..." : "Login"}
+        <span className="relative z-10">
+          {isLoading ? "Signing in..." : "Sign in to LinkedSphere"}
+        </span>
       </Button>
     </form>
   );

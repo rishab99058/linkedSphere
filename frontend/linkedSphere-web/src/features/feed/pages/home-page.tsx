@@ -6,10 +6,9 @@ function HomePage() {
   return (
     <div className="min-h-screen bg-slate-100">
       <Navbar />
-
-      <main className="mx-auto max-w-3xl px-4 py-6">
+      <main className="mx-auto max-w-3xl px-4 py-8">
         <CreatePost />
-
+        
         <div className="mt-6">
           <FeedList />
         </div>

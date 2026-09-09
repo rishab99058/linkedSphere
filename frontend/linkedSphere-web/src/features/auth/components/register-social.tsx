@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  Mail,
-  Phone,
-} from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
@@ -64,6 +58,7 @@ function RegisterForm() {
   >({});
 
   const [serverError, setServerError] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [showPassword, setShowPassword] =
@@ -102,8 +97,7 @@ function RegisterForm() {
       > = {};
 
       result.error.issues.forEach((issue) => {
-        const field =
-          issue.path[0] as keyof RegisterFormData;
+        const field = issue.path[0] as keyof RegisterFormData;
 
         if (!fieldErrors[field]) {
           fieldErrors[field] = issue.message;
@@ -145,96 +139,60 @@ function RegisterForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4"
+      className="space-y-5"
       noValidate
     >
-      {/* Email */}
-      <div className="space-y-1.5">
-        <Label
-          htmlFor="register-email"
-          className="text-sm font-semibold text-slate-700"
-        >
-          Email address
+      <div className="space-y-2">
+        <Label htmlFor="register-email">
+          Email
         </Label>
 
-        <div className="relative">
-          <Mail
-            size={17}
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-          />
-
-          <Input
-            id="register-email"
-            type="email"
-            autoComplete="email"
-            placeholder="you@example.com"
-            value={formData.email}
-            onChange={(event) =>
-              updateField(
-                "email",
-                event.target.value,
-              )
-            }
-            disabled={isLoading}
-            className={`h-11 rounded-xl border-slate-200 bg-white pl-10 text-sm shadow-sm transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 ${
-              errors.email
-                ? "border-red-300 focus:border-red-400"
-                : ""
-            }`}
-          />
-        </div>
+        <Input
+          id="register-email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          value={formData.email}
+          onChange={(event) =>
+            updateField("email", event.target.value)
+          }
+          disabled={isLoading}
+        />
 
         {errors.email && (
-          <p className="text-xs font-medium text-destructive">
+          <p className="text-xs text-destructive">
             {errors.email}
           </p>
         )}
       </div>
 
-      {/* Phone */}
-      <div className="space-y-1.5">
-        <Label
-          htmlFor="register-phone"
-          className="text-sm font-semibold text-slate-700"
-        >
+      <div className="space-y-2">
+        <Label htmlFor="register-phone">
           Phone number
         </Label>
 
-        <div className="relative">
-          <Phone
-            size={17}
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-          />
-
-          <Input
-            id="register-phone"
-            type="tel"
-            autoComplete="tel"
-            placeholder="+91 9876543210"
-            value={formData.phoneNumber}
-            onChange={(event) =>
-              updateField(
-                "phoneNumber",
-                event.target.value,
-              )
-            }
-            disabled={isLoading}
-            className={`h-11 rounded-xl border-slate-200 bg-white pl-10 text-sm shadow-sm transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 ${
-              errors.phoneNumber
-                ? "border-red-300 focus:border-red-400"
-                : ""
-            }`}
-          />
-        </div>
+        <Input
+          id="register-phone"
+          type="tel"
+          autoComplete="tel"
+          placeholder="+91 9876543210"
+          value={formData.phoneNumber}
+          onChange={(event) =>
+            updateField(
+              "phoneNumber",
+              event.target.value,
+            )
+          }
+          disabled={isLoading}
+        />
 
         {errors.phoneNumber && (
-          <p className="text-xs font-medium text-destructive">
+          <p className="text-xs text-destructive">
             {errors.phoneNumber}
           </p>
         )}
       </div>
 
-      {/* Password */}
       <PasswordField
         id="register-password"
         label="Password"
@@ -244,16 +202,13 @@ function RegisterForm() {
         disabled={isLoading}
         error={errors.password}
         onToggle={() =>
-          setShowPassword(
-            (previous) => !previous,
-          )
+          setShowPassword((previous) => !previous)
         }
         onChange={(value) =>
           updateField("password", value)
         }
       />
 
-      {/* Confirm password */}
       <PasswordField
         id="register-confirm-password"
         label="Confirm password"
@@ -268,33 +223,24 @@ function RegisterForm() {
           )
         }
         onChange={(value) =>
-          updateField(
-            "confirmPassword",
-            value,
-          )
+          updateField("confirmPassword", value)
         }
       />
 
-      {/* Server error */}
       {serverError && (
-        <div className="rounded-xl border border-red-200 bg-red-50/80 px-4 py-3">
-          <p className="text-sm font-medium leading-5 text-red-700">
-            {serverError}
-          </p>
-        </div>
+        <p className="text-sm text-destructive">
+          {serverError}
+        </p>
       )}
 
-      {/* Submit */}
       <Button
         type="submit"
+        className="h-11 w-full"
         disabled={isLoading}
-        className="group relative h-11 w-full overflow-hidden rounded-xl bg-slate-950 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-xl hover:shadow-blue-600/20 disabled:translate-y-0 disabled:opacity-70"
       >
-        <span className="relative z-10">
-          {isLoading
-            ? "Creating account..."
-            : "Create your account"}
-        </span>
+        {isLoading
+          ? "Creating account..."
+          : "Create account"}
       </Button>
     </form>
   );
@@ -322,42 +268,27 @@ function PasswordField({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label
-        htmlFor={id}
-        className="text-sm font-semibold text-slate-700"
-      >
-        {label}
-      </Label>
+    <div className="space-y-2">
+      <Label htmlFor={id}>{label}</Label>
 
       <div className="relative">
-        <LockKeyhole
-          size={17}
-          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-        />
-
         <Input
           id={id}
           type={visible ? "text" : "password"}
           autoComplete={autoComplete}
-          placeholder="Enter your password"
+          placeholder="••••••••"
           value={value}
           onChange={(event) =>
             onChange(event.target.value)
           }
           disabled={disabled}
-          className={`h-11 rounded-xl border-slate-200 bg-white pl-10 pr-11 text-sm shadow-sm transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 ${
-            error
-              ? "border-red-300 focus:border-red-400"
-              : ""
-          }`}
+          className="pr-11"
         />
 
         <button
           type="button"
           onClick={onToggle}
-          disabled={disabled}
-          className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition-colors hover:text-slate-700 disabled:pointer-events-none disabled:opacity-50"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           aria-label={
             visible
               ? "Hide password"
@@ -365,15 +296,15 @@ function PasswordField({
           }
         >
           {visible ? (
-            <EyeOff size={17} />
+            <EyeOff size={18} />
           ) : (
-            <Eye size={17} />
+            <Eye size={18} />
           )}
         </button>
       </div>
 
       {error && (
-        <p className="text-xs font-medium text-destructive">
+        <p className="text-xs text-destructive">
           {error}
         </p>
       )}
