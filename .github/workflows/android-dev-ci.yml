@@ -1,66 +1,97 @@
-name: LinkedSphere Android DEV CI
+name: LinkedSphere Android DEV
 
 on:
-    push:
-        branches:
-            - develop
+  pull_request:
+    branches:
+      - develop
 
-    pull_request:
-        branches:
-            - develop
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
 
 jobs:
-    android-ci:
-        name: Android DEV CI
-        runs-on: ubuntu-latest
 
-        defaults:
-            run:
-                working-directory: mobile
+  # ============================================================
+  # CI
+  # ============================================================
+  ci:
+    name: Android CI
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    defaults:
+      run:
+        working-directory: mobile
 
-            - name: Setup Flutter
-              uses: subosito/flutter-action@v2
-              with:
-                  channel: stable
-                  cache: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Flutter version
-              run: flutter --version
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
 
-            - name: Add Dart Pub Cache to PATH
-              run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+      - name: Install dependencies
+        run: flutter pub get
 
-            - name: Install FlutterFire CLI
-              run: dart pub global activate flutterfire_cli
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed .
 
-            - name: Install dependencies
-              run: flutter pub get
+      - name: Analyze
+        run: flutter analyze
 
-            - name: Analyze
-              run: flutter analyze
+      - name: Run tests
+        run: flutter test
 
-            - name: Run tests
-              run: flutter test
 
-            - name: Build Android DEV APK
-              run: |
-                  flutter build apk \
-                    --dart-define=ENV=dev
+  # ============================================================
+  # CD
+  # ============================================================
+  cd:
+    name: Android DEV CD
+    runs-on: ubuntu-latest
 
-            - name: Find generated APK
-              run: |
-                  echo "Generated APK files:"
-                  find build -type f -name "*.apk" -print
+    defaults:
+      run:
+        working-directory: mobile
 
-            - name: Upload APK to Firebase App Distribution
-              uses: wzieba/Firebase-Distribution-Github-Action@v1
-              with:
-                  appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
-                  serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-                  file: build/app/outputs/flutter-apk/app-dev-release.apk
-                  groups: developers
-                  releaseNotes: "DEV build from develop branch"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build DEV APK
+        run: |
+          flutter build apk \
+            --dart-define=ENV=dev
+
+      - name: Verify APK
+        run: |
+          echo "Generated APK files:"
+          find "$GITHUB_WORKSPACE" -type f -name "*.apk" -print
+
+      - name: Upload APK to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          file: ${{ github.workspace }}/mobile/build/app/outputs/flutter-apk/app-release.apk
+          groups: developers
+          releaseNotes: |
+            LinkedSphere DEV build
+
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Build: ${{ github.run_number }}
