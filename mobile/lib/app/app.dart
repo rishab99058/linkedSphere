@@ -1,6 +1,7 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile/app/theme.dart';
+import 'package:mobile/core/navigation_service.dart';
 import 'package:mobile/features/splash/splash_screen.dart';
 
 class LinkedSphereApp extends StatelessWidget {
@@ -9,6 +10,7 @@ class LinkedSphereApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: rootNavigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'LinkedSphere',
       theme: AppTheme.lightTheme,

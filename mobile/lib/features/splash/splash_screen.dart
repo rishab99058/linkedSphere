@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile/core/costants.dart';
 import 'package:mobile/features/auth/screen/login.dart';
+import 'package:mobile/features/main/bottom_navigation_bar.dart';
 import 'package:mobile/features/onboarding/screens/onboarding.dart';
 import 'package:mobile/storage/secure_storage.dart';
 
@@ -28,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
 
-    // Navigate to OnBoardingScreen after 3 seconds
+    // Navigate after 3 seconds
     _timer = Timer(const Duration(seconds: 3), _goToHome);
   }
 
@@ -39,15 +40,24 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _goToHome() async {
+    final isFirstLaunch = await SecureStorage.getIsFirstLaunch();
+    final isLoggedIn = await SecureStorage.getIsLoggedIn();
+    final refreshToken = await SecureStorage.getRefreshToken();
+
     if (!mounted) return;
-    bool isFirstLaunch = await SecureStorage.getIsFirstLaunch();
-    bool isLoggedIn = await SecureStorage.getIsLoggedIn();
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) =>
-            isFirstLaunch ? const OnBoardingScreen() : const LoginScreen(),
-      ),
-    );
+
+    Widget nextScreen;
+    if (isFirstLaunch) {
+      nextScreen = const OnBoardingScreen();
+    } else if (isLoggedIn && refreshToken != null && refreshToken.isNotEmpty) {
+      nextScreen = const MainScreen();
+    } else {
+      nextScreen = const LoginScreen();
+    }
+
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => nextScreen));
   }
 
   @override

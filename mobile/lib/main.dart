@@ -1,9 +1,11 @@
 import 'dart:ui';
 
 import 'package:dio/dio.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/app/app.dart';
 import 'package:mobile/config/appConfig.dart';
 import 'package:mobile/core/google_service_auth.dart';
@@ -19,6 +21,7 @@ Future<void> main() async {
 
     return true;
   };
+  FirebaseAnalytics.instance;
   debugPrint(AppConfig.baseUrl);
   debugPrint(AppConfig.environment.toString());
   final apiClient = ApiClient();
@@ -26,14 +29,14 @@ Future<void> main() async {
 
   try {
     final response = await apiClient.dio.get('/actuator/health');
-    print('✅ Status Code: ${response.statusCode}');
-    print('✅ Data: ${response.data}');
+    debugPrint('✅ Status Code: ${response.statusCode}');
+    debugPrint('✅ Data: ${response.data}');
   } on DioException catch (e) {
-    print('❌ Dio Error Status Code: ${e.response?.statusCode}');
-    print('❌ Dio Error Message: ${e.message}');
-    print('❌ Dio Error Response: ${e.response?.data}');
+    debugPrint('❌ Dio Error Status Code: ${e.response?.statusCode}');
+    debugPrint('❌ Dio Error Message: ${e.message}');
+    debugPrint('❌ Dio Error Response: ${e.response?.data}');
   } catch (e) {
-    print('❌ General Error: $e');
+    debugPrint('❌ General Error: $e');
   }
-  runApp(const LinkedSphereApp());
+  runApp(const ProviderScope(child: LinkedSphereApp()));
 }

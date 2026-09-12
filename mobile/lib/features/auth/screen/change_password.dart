@@ -3,7 +3,6 @@ import 'package:mobile/core/colors.dart';
 import 'package:mobile/core/costants.dart';
 import 'package:mobile/core/validators.dart';
 import 'package:mobile/features/auth/model/change_password_request.dart';
-import 'package:mobile/features/auth/model/change_password_respose.dart';
 import 'package:mobile/features/auth/repository/authRepository.dart';
 import 'package:mobile/features/auth/screen/login.dart';
 import 'package:mobile/network/apiClient.dart';
@@ -53,21 +52,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       password: passwordController.text,
     );
 
-    try {
-      var response = await authRepository.resetPassword(req);
-
-      if (response != null) {
-        ChangePasswordResponse res = response;
-        if (!mounted) return;
-        AppToast.success(res.message);
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (context) => LoginScreen()));
-      }
-    } catch (e) {
-      debugPrint('Failed to change password: ${e.toString()}');
-      AppToast.error(e.toString());
-    }
+    final response = await authRepository.resetPassword(req);
+    if (!mounted) return;
+    AppToast.success(response.message);
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const LoginScreen()));
   }
 
   @override

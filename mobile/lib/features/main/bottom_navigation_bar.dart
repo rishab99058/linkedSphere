@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/features/main/widgets/profile_screen.dart';
+import 'package:mobile/features/main/widgets/main_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -8,14 +10,14 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 4;
+  int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    Container(child: Center(child: Text("Home"))),
-    Container(child: Center(child: Text("Search"))),
-    Container(child: Center(child: Text("Create"))),
-    Container(child: Center(child: Text("Messages"))),
-    Container(child: Center(child: Text("Profile"))),
+    const HomeScreen(),
+    const Center(child: Text("Search")),
+    const Center(child: Text("Create")),
+    const Center(child: Text("Messages")),
+    const ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {

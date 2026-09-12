@@ -68,7 +68,7 @@ jwt:
 
 google:
   oauth:
-    client-ids: "190262577212-mkpofmng8u4csgijo38s0ev8fs2j6jmc.apps.googleusercontent.com"
+    client-ids: "190262577212-mkpofmng8u4csgijo38s0ev8fs2j6jmc.apps.googleusercontent.com,190262577212-efgmj2jm7r8flgkl95s229ppc2bk6htg.apps.googleusercontent.com"
 
 neo4j:
   uri: neo4j+s://7af93226.databases.neo4j.io
