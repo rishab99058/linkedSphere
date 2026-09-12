@@ -9,7 +9,7 @@ eureka:
       defaultZone: https://linksphere-discovery-server-190262577212.asia-south2.run.app/eureka/
   instance:
     prefer-ip-address: false
-    hostname: ${SERVICE_HOSTNAME}
+    hostname: ${SERVICE_HOSTNAME:localhost}
     secure-port-enabled: true
     secure-port: 443
     non-secure-port-enabled: false

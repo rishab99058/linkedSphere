@@ -7,7 +7,6 @@ import lombok.Data;
 
 @Data
 @ConfigurationProperties(prefix = "jwt")
-@Component
 public class JwtProperties {
 
     private String secret;
