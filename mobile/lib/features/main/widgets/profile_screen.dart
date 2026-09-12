@@ -5,6 +5,7 @@ import 'package:mobile/features/auth/screen/login.dart';
 import 'package:mobile/features/main/model/profile_model.dart';
 import 'package:mobile/features/main/model/profile_not_foud_exception.dart';
 import 'package:mobile/features/main/repository/profile_repository.dart';
+import 'package:mobile/features/main/widgets/create_update_profile_scree.dart';
 import 'package:mobile/network/apiClient.dart';
 import 'package:mobile/shared/widgets/appButton.dart';
 import 'package:mobile/shared/widgets/appDialog.dart';
@@ -74,7 +75,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   void _openCreateProfile() {
-    // TODO: Navigate to create profile screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProfileFormScreen()),
+    );
   }
 
   void _openEditProfile() {
