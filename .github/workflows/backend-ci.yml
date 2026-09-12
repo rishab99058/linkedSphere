@@ -459,3 +459,19 @@ jobs:
             --port=9000 \
             --allow-unauthenticated \
             --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_NOTIFICATION_SERVICE_HOSTNAME}}"
+
+      # =========================================================
+      # DEPLOY POST SERVICE
+      # =========================================================
+
+      - name: Deploy Post Service
+        if: contains(steps.affected.outputs.affected_services, 'post-service')
+        run: |
+          gcloud run deploy linksphere-post-service \
+            --image="ghcr.io/${{ github.repository_owner }}/linksphere-post-service:${GITHUB_SHA}" \
+            --region="asia-south2" \
+            --project="${{ secrets.GCP_DEV_PROJECT_ID }}" \
+            --platform=managed \
+            --port=8009 \
+            --allow-unauthenticated \
+            --set-env-vars="SPRING_PROFILES_ACTIVE=dev,SERVICE_HOSTNAME=${{secrets.GCP_DEV_POST_SERVICE_HOSTNAME}}"
