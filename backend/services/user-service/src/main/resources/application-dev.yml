@@ -14,6 +14,13 @@ eureka:
     secure-port: 443
     non-secure-port-enabled: false
 
+aws:
+  s3:
+    region: ap-south-1
+    bucket-name: linkedsphere-dev-media
+    access-key: AKIA5G4TNWPLXHYE2GG3
+    secret-key: 3i4ag2Ls+lJXyx9X0akBu6alqwM7fUBvuliGzxZ
+
 spring:
   servlet:
     multipart:

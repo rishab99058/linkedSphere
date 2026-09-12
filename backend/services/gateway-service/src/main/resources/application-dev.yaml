@@ -24,6 +24,7 @@ spring:
           "[/**]":
             allowedOrigins:
               - "http://localhost:3000"
+              - "https://linksphere-web-190262577212.asia-south2.run.app"
             allowedMethods:
               - GET
               - POST

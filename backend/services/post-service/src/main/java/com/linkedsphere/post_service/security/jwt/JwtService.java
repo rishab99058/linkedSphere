@@ -49,30 +49,28 @@ public class JwtService {
         return UUID.fromString(userId);
     }
 
+    public java.util.List<String> extractRoles(String token) {
+        Claims claims = extractAllClaims(token);
+        @SuppressWarnings("unchecked")
+        java.util.List<String> roles = (java.util.List<String>) claims.get("roles");
+        return roles != null ? roles : java.util.List.of();
+    }
+
     public boolean isTokenExpired(String token) {
-
-        Date expiration =
-                extractAllClaims(token).getExpiration();
-
+        Date expiration = extractAllClaims(token).getExpiration();
         return expiration.before(new Date());
     }
 
     public boolean isTokenValid(String token) {
-
         try {
-
             Claims claims = extractAllClaims(token);
 
-            if (!jwtProperties.getIssuer().equals(
-                    claims.getIssuer())) {
+            if (jwtProperties.getIssuer() != null && !jwtProperties.getIssuer().equals(claims.getIssuer())) {
                 return false;
             }
 
-            return claims.getExpiration()
-                    .after(new Date());
-
+            return claims.getExpiration().after(new Date());
         } catch (Exception e) {
-
             return false;
         }
     }

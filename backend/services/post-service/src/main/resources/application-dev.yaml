@@ -9,7 +9,7 @@ eureka:
       defaultZone: https://linksphere-discovery-server-190262577212.asia-south2.run.app/eureka/
   instance:
     prefer-ip-address: false
-    hostname: ${SERVICE_HOSTNAME}
+    hostname: ${SERVICE_HOSTNAME:localhost}
     secure-port-enabled: true
     secure-port: 443
     non-secure-port-enabled: false
@@ -26,7 +26,8 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb+srv://rishab99058_db_user:0Qn6ffhVu0KZM5kf@cluster1.7kenqxn.mongodb.net/
+      uri: mongodb+srv://rishab99058_db_user:0Qn6ffhVu0KZM5kf@cluster1.7kenqxn.mongodb.net/post_service?retryWrites=true&w=majority
+      database: post_service
     redis:
       host: known-doe-132811.upstash.io
       port: 6379
