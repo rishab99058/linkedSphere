@@ -15,4 +15,7 @@ public final class RabbitMQConstants {
     public static final String NOTIFICATION_CREATED = "notification.created";
     public static final String EMAIL_SEND = "email.send";
 
+    public static final String N8N_QUEUE = "n8n.queue";
+    public static final String N8N_TRIGGER_RECEIVED = "n8n.trigger.received";
+
 }

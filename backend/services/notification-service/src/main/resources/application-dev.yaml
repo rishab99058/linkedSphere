@@ -9,7 +9,7 @@ eureka:
       defaultZone: https://linksphere-discovery-server-190262577212.asia-south2.run.app/eureka/
   instance:
     prefer-ip-address: false
-    hostname: ${SERVICE_HOSTNAME}
+    hostname: ${SERVICE_HOSTNAME:localhost}
     secure-port-enabled: true
     secure-port: 443
     non-secure-port-enabled: false
@@ -62,3 +62,7 @@ spring:
     password: SRzPZy6UL8ZtZLfONaGd9rjj4K64PYHl
     ssl:
       enabled: true
+
+firebase:
+  config-path: ${FIREBASE_CONFIG_PATH:classpath:firebase/linkedsphere-dev-firebase-adminsdk-fbsvc-7cc0f51599.json}
+

@@ -12,7 +12,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JwtService {
@@ -66,11 +68,13 @@ public class JwtService {
             Claims claims = extractAllClaims(token);
 
             if (jwtProperties.getIssuer() != null && !jwtProperties.getIssuer().equals(claims.getIssuer())) {
+                log.warn("JWT issuer mismatch: expected '{}', got '{}'", jwtProperties.getIssuer(), claims.getIssuer());
                 return false;
             }
 
             return claims.getExpiration().after(new Date());
         } catch (Exception e) {
+            log.error("JWT validation failed: {}", e.getMessage());
             return false;
         }
     }

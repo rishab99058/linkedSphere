@@ -49,6 +49,7 @@
         <module>services/discovery-server</module>
         <module>services/notification-service</module>
         <module>services/post-service</module>
+        <module>services/chat_service</module>
     </modules>
 
     <dependencyManagement>

@@ -51,3 +51,9 @@ imagekit:
   public-key: public_RKLdGzOd0r27S2eOEwb0UjxDvXE=
   private-key: private_VHI4gkUX6c3PHZEl/+aOkBDB+yQ=
   url-endpoint: https://ik.imagekit.io/b4eam6xij
+
+opensearch:
+  host: os-194f817d-rishab99058-5e60.a.aivencloud.com
+  port: 20716
+  username: avnadmin
+  password: AVNS_1OtQH9VCcDQM5GT2id5

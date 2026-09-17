@@ -47,4 +47,9 @@ spring:
         - id: post-service
           uri: lb://post-service
           predicates:
-            - Path=/posts/**
+            - Path=/post/**
+
+        - id: chat-service
+          uri: lb://chat-service
+          predicates:
+            - Path=/chat/**

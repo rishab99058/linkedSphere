@@ -7,7 +7,7 @@ eureka:
       defaultZone: https://linksphere-discovery-server-190262577212.asia-south2.run.app/eureka/
   instance:
     prefer-ip-address: false
-    hostname: ${SERVICE_HOSTNAME}
+    hostname: ${SERVICE_HOSTNAME:localhost}
     secure-port-enabled: true
     secure-port: 443
     non-secure-port-enabled: false
@@ -50,3 +50,13 @@ spring:
           uri: lb://notification-service
           predicates:
             - Path=/notifications/**
+
+        - id: post-service
+          uri: lb://post-service
+          predicates:
+            - Path=/post/**
+
+        - id: chat-service
+          uri: lb://chat-service
+          predicates:
+            - Path=/chat/**

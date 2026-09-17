@@ -1,4 +1,4 @@
-package com.linkedsphere.post_service.security.jwt;
+package com.linkedsphere.chat_service.security.jwt;
 
 import java.io.IOException;
 

@@ -1,16 +1,17 @@
 package com.linksphere.user_service.security.jwt;
 
 import java.nio.charset.StandardCharsets;
-import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+
+import javax.crypto.SecretKey;
 
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -27,7 +28,6 @@ public class JwtService {
     }
 
     public Claims extractAllClaims(String token) {
-
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
@@ -36,43 +36,36 @@ public class JwtService {
     }
 
     public String extractUsername(String token) {
-
-        return extractAllClaims(token)
-                .getSubject();
+        return extractAllClaims(token).getSubject();
     }
 
     public UUID extractUserId(String token) {
-
-        String userId = extractAllClaims(token)
-                .get("uid", String.class);
-
+        String userId = extractAllClaims(token).get("uid", String.class);
         return UUID.fromString(userId);
     }
 
+    public List<String> extractRoles(String token) {
+        Claims claims = extractAllClaims(token);
+        @SuppressWarnings("unchecked")
+        List<String> roles = (List<String>) claims.get("roles");
+        return roles != null ? roles : List.of();
+    }
+
     public boolean isTokenExpired(String token) {
-
-        Date expiration =
-                extractAllClaims(token).getExpiration();
-
+        Date expiration = extractAllClaims(token).getExpiration();
         return expiration.before(new Date());
     }
 
     public boolean isTokenValid(String token) {
-
         try {
-
             Claims claims = extractAllClaims(token);
 
-            if (!jwtProperties.getIssuer().equals(
-                    claims.getIssuer())) {
+            if (jwtProperties.getIssuer() != null && !jwtProperties.getIssuer().equals(claims.getIssuer())) {
                 return false;
             }
 
-            return claims.getExpiration()
-                    .after(new Date());
-
+            return claims.getExpiration().after(new Date());
         } catch (Exception e) {
-
             return false;
         }
     }

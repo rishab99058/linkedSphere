@@ -48,6 +48,27 @@ services:
 
 
   # =========================
+  # MongoDB
+  # =========================
+  mongodb:
+    image: mongo:7
+    container_name: linksphere-mongodb
+    restart: unless-stopped
+
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - mongodb-data:/data/db
+
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  # =========================
   # Discovery Server
   # =========================
   # discovery-server:
@@ -148,9 +169,38 @@ services:
   #     SPRING_RABBITMQ_PASSWORD: linksphere
 
 
+  # =========================
+  # Chat Service
+  # =========================
+  # chat-service:
+  #   image: rishab99058/linksphere-chat-service:v1.0.0
+  #   container_name: linksphere-chat-service
+  #   restart: unless-stopped
+  #
+  #   ports:
+  #     - "8008:8008"
+  #
+  #   depends_on:
+  #     discovery-server:
+  #       condition: service_healthy
+  #     mongodb:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: dev
+  #     SERVER_PORT: 8008
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+  #     SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/chat_service
+  #     SPRING_DATA_REDIS_HOST: redis
+  #     SPRING_DATA_REDIS_PORT: 6379
+
+
 volumes:
   redis-data:
   rabbitmq-data:
+  mongodb-data:
 
 
 # PostgreSQL:
