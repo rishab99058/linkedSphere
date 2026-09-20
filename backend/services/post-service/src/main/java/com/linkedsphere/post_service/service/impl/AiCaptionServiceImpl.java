@@ -109,6 +109,7 @@ public class AiCaptionServiceImpl implements AiCaptionService {
                 }
             } else if (rootNode.hasNonNull("response")) {
                 contentNode = rootNode.get("response");
+            } else if (rootNode.hasNonNull("output")) {
                 contentNode = rootNode.get("output");
             }
 
