@@ -83,6 +83,50 @@ public enum ErrorCode {
         ALREADY_CONNECTED(
                         "ALREADY_CONNECTED",
                         "Already connected",
+                        HttpStatus.BAD_REQUEST),
+
+        // ===========================
+        // Chat
+        // ===========================
+
+        CONVERSATION_NOT_FOUND(
+                        "CHAT_001",
+                        "Conversation not found",
+                        HttpStatus.NOT_FOUND),
+
+        NOT_CONVERSATION_MEMBER(
+                        "CHAT_002",
+                        "User is not a member of this conversation",
+                        HttpStatus.FORBIDDEN),
+
+        AT_LEAST_ONE_PARTICIPANT_REQUIRED(
+                        "CHAT_003",
+                        "At least one participant is required",
+                        HttpStatus.BAD_REQUEST),
+
+        CANNOT_INCLUDE_SELF_IN_PARTICIPANTS(
+                        "CHAT_004",
+                        "Current user should not be included in participantIds",
+                        HttpStatus.BAD_REQUEST),
+
+        DIRECT_CONVERSATION_MEMBER_LIMIT(
+                        "CHAT_005",
+                        "Direct conversation must contain exactly two users",
+                        HttpStatus.BAD_REQUEST),
+
+        MESSAGE_NOT_FOUND(
+                        "CHAT_006",
+                        "Message not found",
+                        HttpStatus.NOT_FOUND),
+
+        MESSAGE_CONTENT_REQUIRED(
+                        "CHAT_007",
+                        "Message content is required",
+                        HttpStatus.BAD_REQUEST),
+
+        MESSAGE_ATTACHMENT_REQUIRED(
+                        "CHAT_008",
+                        "Message attachment is required",
                         HttpStatus.BAD_REQUEST);
 
         private final String code;

@@ -23,11 +23,15 @@ public class JwtService {
     private final JwtProperties jwtProperties;
 
     public String generateAccessToken(CustomUserDetails userDetails) {
+        List<String> roles = userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()
+                ? userDetails.getAuthorities().stream().map(a -> a.getAuthority()).toList()
+                : List.of("ROLE_USER");
+
         return Jwts
                 .builder()
                 .subject(userDetails.getUsername())
                 .claim("uid", userDetails.getId().toString())
-                .claim("roles", userDetails.getAuthorities().stream().map(a -> a.getAuthority()).toList())
+                .claim("roles", roles)
                 .issuedAt(new Date())
                 .issuer(jwtProperties.getIssuer())
                 .expiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessTokenExpiration()))

@@ -69,7 +69,8 @@ if [[ "$common_changed" == true ]]; then
         auth-service \
         user-service \
         notification-service \
-        post-service
+        post-service \
+        chat-service
     do
 
         case ",$services," in

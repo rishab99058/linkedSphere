@@ -28,7 +28,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.contains("/actuator") || path.contains("/health");
+        String contextPath = request.getContextPath();
+        String pathWithinContext = (contextPath != null && !contextPath.isEmpty() && path.startsWith(contextPath))
+                ? path.substring(contextPath.length())
+                : path;
+        return pathWithinContext.startsWith("/actuator") || pathWithinContext.equals("/health");
     }
 
     @Override
@@ -66,14 +70,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email =
                     jwtService.extractUsername(token);
 
+            java.util.List<String> roles =
+                    jwtService.extractRoles(token);
+
             AuthenticatedUser user =
-                    new AuthenticatedUser(userId, email);
+                    AuthenticatedUser.builder()
+                            .userId(userId)
+                            .email(email)
+                            .roles(roles)
+                            .build();
+
+            java.util.List<SimpleGrantedAuthority> authorities =
+                    roles.stream()
+                            .map(SimpleGrantedAuthority::new)
+                            .toList();
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             user,
                             null,
-                            java.util.List.of()
+                            authorities
                     );
 
             SecurityContextHolder

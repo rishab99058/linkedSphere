@@ -50,3 +50,6 @@ spring:
     password: SRzPZy6UL8ZtZLfONaGd9rjj4K64PYHl
     ssl:
       enabled: true
+
+firebase:
+  config-path: classpath:firebase/linkedsphere-dev-firebase-adminsdk-fbsvc-7cc0f51599.json

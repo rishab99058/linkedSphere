@@ -167,12 +167,14 @@ function Pillar({
       }`}
     >
       <div className="mb-2.5 flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.05] text-blue-300 ring-1 ring-white/[0.08]">
-        {React.cloneElement(
-          icon as React.ReactElement,
-          {
-            size: 16,
-          },
-        )}
+        {React.isValidElement(icon)
+          ? React.cloneElement(
+              icon as React.ReactElement<{ size?: number }>,
+              {
+                size: 16,
+              },
+            )
+          : icon}
       </div>
 
       <p className="text-xs font-semibold text-white">

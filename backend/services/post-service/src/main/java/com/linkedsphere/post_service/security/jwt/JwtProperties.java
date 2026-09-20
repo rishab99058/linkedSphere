@@ -6,11 +6,13 @@ import org.springframework.stereotype.Component;
 import lombok.Data;
 
 @Data
-@ConfigurationProperties(prefix = "jwt")
 @Component
+@ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
 
     private String secret;
+    private Long accessTokenExpiration;
+    private Long refreshTokenExpiration;
     private String issuer;
 
 }

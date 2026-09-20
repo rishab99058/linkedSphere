@@ -280,8 +280,8 @@ function BackgroundNode({
   cy,
   strong = false,
 }: {
-  cx: number;
-  cy: number;
+  cx: number | string;
+  cy: number | string;
   strong?: boolean;
 }) {
   return (
