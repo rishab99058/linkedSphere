@@ -1,20 +1,27 @@
 package com.linksphere.user_service.service.impl;
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import com.linksphere.common.enums.ErrorCode;
+import com.linksphere.common.events.UserSyncEvent;
 import com.linksphere.common.exception.BaseException;
 import com.linksphere.common.response.CurrentUserResponse;
+import com.linksphere.common.response.UserSummaryResponse;
 import com.linksphere.user_service.client.AuthServiceClient;
 import com.linksphere.user_service.dto.request.CreateUserProfileRequest;
 import com.linksphere.user_service.dto.request.UpdateUserProfileRequest;
 import com.linksphere.user_service.dto.response.CreateUserProfileResponse;
 import com.linksphere.user_service.entity.UserProfileEntity;
+import com.linksphere.user_service.rabbitmq.UserEventPublisher;
 import com.linksphere.user_service.repository.UserProfileRepository;
+import com.linksphere.user_service.repository.projection.UserBasicProjection;
 import com.linksphere.user_service.security.user.AuthenticatedUser;
 import com.linksphere.user_service.service.UserProfileService;
 
@@ -29,6 +36,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
     private final AuthServiceClient authServiceClient;
+    private final UserEventPublisher userEventPublisher;
 
     @Override
     public CreateUserProfileResponse createUserProfile(CreateUserProfileRequest request, AuthenticatedUser user) {
@@ -70,6 +78,16 @@ public class UserProfileServiceImpl implements UserProfileService {
             log.error("Failed to save user profile");
             throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
+
+        userEventPublisher.publishUserSync(UserSyncEvent.builder()
+                .userId(savedUserProfile.getId().toString())
+                .authId(savedUserProfile.getAuthId().toString())
+                .fullName(savedUserProfile.getFullName())
+                .headline(savedUserProfile.getHeadline())
+                .location(savedUserProfile.getLocation())
+                .industry(savedUserProfile.getIndustry())
+                .profilePictureUrl(savedUserProfile.getProfilePictureUrl())
+                .build());
 
         return CreateUserProfileResponse.builder()
                 .id(savedUserProfile.getId().toString())
@@ -150,6 +168,16 @@ public class UserProfileServiceImpl implements UserProfileService {
             log.error("Failed to save user profile");
             throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
+
+        userEventPublisher.publishUserSync(UserSyncEvent.builder()
+                .userId(savedUserProfile.getId().toString())
+                .authId(savedUserProfile.getAuthId().toString())
+                .fullName(savedUserProfile.getFullName())
+                .headline(savedUserProfile.getHeadline())
+                .location(savedUserProfile.getLocation())
+                .industry(savedUserProfile.getIndustry())
+                .profilePictureUrl(savedUserProfile.getProfilePictureUrl())
+                .build());
 
         return CreateUserProfileResponse.builder()
                 .id(savedUserProfile.getId().toString())
@@ -247,6 +275,41 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .industry(userProfile.get().getIndustry())
                 .websiteUrl(userProfile.get().getWebsiteUrl())
                 .build();
+    }
+
+    @Override
+    public List<UserSummaryResponse> getBasicUsersByIds(List<String> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<UUID> uuids = userIds.stream()
+                .filter(id -> id != null && !id.isBlank())
+                .map(id -> {
+                    try {
+                        return UUID.fromString(id);
+                    } catch (IllegalArgumentException e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        if (uuids.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<UserBasicProjection> projections = userProfileRepository.findBasicUsersByIds(uuids);
+
+        return projections.stream()
+                .map(p -> UserSummaryResponse.builder()
+                        .userId(p.getUserId() != null ? p.getUserId().toString() : null)
+                        .fullName(p.getFullName())
+                        .profilePictureUrl(p.getProfilePictureUrl())
+                        .headline(p.getHeadline())
+                        .location(p.getLocation())
+                        .build())
+                .toList();
     }
 
 }

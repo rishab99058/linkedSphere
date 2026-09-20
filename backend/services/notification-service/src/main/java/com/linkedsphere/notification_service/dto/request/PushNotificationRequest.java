@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PushNotificationRequest {
 
-    private String token; // FCM device registration token (or null if topic is used)
+    private String token;
 
-    private String topic; // Optional FCM topic (e.g., "all-users", "dev-announcements")
+    private String topic;
 
     @NotBlank(message = "Title must not be blank")
     private String title;
@@ -24,7 +24,7 @@ public class PushNotificationRequest {
     @NotBlank(message = "Body must not be blank")
     private String body;
 
-    private String imageUrl; // Optional image URL for rich notifications
+    private String imageUrl;
 
-    private Map<String, String> data; // Optional custom key-value payload
+    private Map<String, String> data;
 }

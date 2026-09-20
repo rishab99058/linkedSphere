@@ -64,5 +64,4 @@ spring:
       enabled: true
 
 firebase:
-  config-path: ${FIREBASE_CONFIG_PATH:classpath:firebase/linkedsphere-dev-firebase-adminsdk-fbsvc-7cc0f51599.json}
-
+  config-path: classpath:firebase/linkedsphere-dev-firebase-adminsdk-fbsvc-7cc0f51599.json

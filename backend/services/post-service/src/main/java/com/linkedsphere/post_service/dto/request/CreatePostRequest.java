@@ -9,6 +9,8 @@ import com.linkedsphere.post_service.enums.PostVisibility;
 @Data
 public class CreatePostRequest {
 
+    private String userId;
+
     private String content;
 
     private PostType postType;

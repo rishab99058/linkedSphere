@@ -20,4 +20,6 @@ public interface ConnectionService {
             UUID receiverId,
             Pageable pageable);
 
+    List<String> getConnectedUserIds(UUID userId);
+
 }

@@ -49,3 +49,23 @@ opensearch:
   port: 20716
   username: avnadmin
   password: AVNS_1OtQH9VCcDQM5GT2id5
+
+resilience4j:
+  retry:
+    instances:
+      user-service:
+        max-attempts: 2
+        wait-duration: 500ms
+        retry-exceptions:
+          - feign.FeignException
+          - java.lang.RuntimeException
+
+  circuitbreaker:
+    instances:
+      user-service:
+        register-health-indicator: true
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-type: COUNT_BASED
+        wait-duration-in-open-state: 10s
+        automatic-transition-from-open-to-half-open-enabled: true

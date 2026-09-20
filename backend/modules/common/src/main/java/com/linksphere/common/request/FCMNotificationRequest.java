@@ -1,6 +1,7 @@
 package com.linksphere.common.request;
 
 import lombok.*;
+import java.io.Serializable;
 import java.util.UUID;
 
 import com.linksphere.common.enums.NotificationType;
@@ -10,7 +11,7 @@ import com.linksphere.common.enums.NotificationType;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FCMNotificationRequest {
+public class FCMNotificationRequest implements Serializable {
 
     private UUID recipientId;
 

@@ -60,4 +60,9 @@ public class ConnectionController {
                         pageable));
     }
 
+    @GetMapping("/user-ids")
+    public ResponseEntity<List<String>> getConnectedUserIds(@RequestParam("userId") UUID userId) {
+        return ResponseEntity.ok(connectionService.getConnectedUserIds(userId));
+    }
+
 }

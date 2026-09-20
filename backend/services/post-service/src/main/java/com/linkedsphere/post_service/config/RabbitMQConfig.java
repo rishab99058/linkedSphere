@@ -32,10 +32,22 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue n8nResponseQueue() {
+        return new Queue(RabbitMQConstants.N8N_RESPONSE_QUEUE);
+    }
+
+    @Bean
     public Binding n8nBinding() {
         return BindingBuilder.bind(n8nQueue())
                 .to(linksphereExchange())
                 .with(RabbitMQConstants.N8N_TRIGGER_RECEIVED);
+    }
+
+    @Bean
+    public Binding n8nResponseBinding() {
+        return BindingBuilder.bind(n8nResponseQueue())
+                .to(linksphereExchange())
+                .with(RabbitMQConstants.N8N_RESPONSE_RECEIVED);
     }
 
     @Bean
@@ -46,10 +58,36 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue userSyncQueue() {
+        return new Queue(RabbitMQConstants.USER_SYNC_QUEUE);
+    }
+
+    @Bean
+    public Binding userSyncBinding() {
+        return BindingBuilder.bind(userSyncQueue())
+                .to(linksphereExchange())
+                .with(RabbitMQConstants.USER_SYNC);
+    }
+
+    @Bean
     public Binding emailBinding() {
         return BindingBuilder.bind(emailQueue())
                 .to(linksphereExchange())
                 .with(RabbitMQConstants.EMAIL_SEND);
+    }
+
+    @Bean
+    public org.springframework.amqp.support.converter.MessageConverter jsonMessageConverter() {
+        return new org.springframework.amqp.support.converter.Jackson2JsonMessageConverter();
+    }
+
+    @Bean
+    public org.springframework.amqp.rabbit.core.RabbitTemplate rabbitTemplate(
+            org.springframework.amqp.rabbit.connection.ConnectionFactory connectionFactory) {
+        org.springframework.amqp.rabbit.core.RabbitTemplate template = 
+                new org.springframework.amqp.rabbit.core.RabbitTemplate(connectionFactory);
+        template.setMessageConverter(jsonMessageConverter());
+        return template;
     }
 
 }

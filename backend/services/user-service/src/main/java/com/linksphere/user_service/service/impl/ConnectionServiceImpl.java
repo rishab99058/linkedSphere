@@ -180,4 +180,21 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     }
 
+    @Override
+    public List<String> getConnectedUserIds(UUID userId) {
+        if (userId == null) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<ConnectionEntity> connections = connectionRepository.findByRequesterIdAndStatusOrReceiverIdAndStatus(
+                userId, ConnectionStatus.ACCEPTED,
+                userId, ConnectionStatus.ACCEPTED);
+
+        return connections.stream()
+                .map(c -> c.getRequesterId().equals(userId) ? c.getReceiverId().toString() : c.getRequesterId().toString())
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+    }
+
 }
