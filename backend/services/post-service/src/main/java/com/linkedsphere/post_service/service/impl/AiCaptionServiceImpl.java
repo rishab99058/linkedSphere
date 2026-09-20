@@ -34,7 +34,8 @@ public class AiCaptionServiceImpl implements AiCaptionService {
     private final UserEventPublisher userEventPublisher;
     private final ObjectMapper objectMapper;
 
-    // Thread-safe map to correlate async n8n responses with pending HTTP requests by postId/requestId
+    // Thread-safe map to correlate async n8n responses with pending HTTP requests
+    // by postId/requestId
     private final Map<String, CompletableFuture<GenerateCaptionResponse>> pendingRequests = new ConcurrentHashMap<>();
 
     @Override
@@ -45,7 +46,8 @@ public class AiCaptionServiceImpl implements AiCaptionService {
 
         String authorId = (user != null && user.getUserId() != null)
                 ? user.getUserId().toString()
-                : (request.getAuthorId() != null && !request.getAuthorId().isBlank() ? request.getAuthorId() : "anonymous");
+                : (request.getAuthorId() != null && !request.getAuthorId().isBlank() ? request.getAuthorId()
+                        : "anonymous");
 
         CompletableFuture<GenerateCaptionResponse> future = new CompletableFuture<>();
         pendingRequests.put(correlationId, future);
@@ -57,7 +59,8 @@ public class AiCaptionServiceImpl implements AiCaptionService {
         payload.put("content", request.getPrompt());
         payload.put("postType", "TEXT");
 
-        log.info("🚀 Publishing AI Caption Generation request with correlationId (postId): {}, authorId: {}", correlationId, authorId);
+        log.info("🚀 Publishing AI Caption Generation request with correlationId (postId): {}, authorId: {}",
+                correlationId, authorId);
         userEventPublisher.publishN8nTrigger(payload);
 
         try {
@@ -68,7 +71,8 @@ public class AiCaptionServiceImpl implements AiCaptionService {
             throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "AI Caption service timed out. Please try again.");
         } catch (Exception e) {
             log.error("❌ Error while waiting for n8n AI response: {}", e.getMessage());
-            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to generate AI caption: " + e.getMessage());
+            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR,
+                    "Failed to generate AI caption: " + e.getMessage());
         } finally {
             pendingRequests.remove(correlationId);
         }
@@ -84,28 +88,67 @@ public class AiCaptionServiceImpl implements AiCaptionService {
                 rootNode = rootNode.get(0);
             }
 
+            // Check if there's an inner 'text' or 'response' or 'output' node that contains
+            // JSON string
+            JsonNode contentNode = rootNode;
+            if (rootNode.hasNonNull("text")) {
+                String textStr = rootNode.get("text").asText().trim();
+                if (textStr.startsWith("```json")) {
+                    textStr = textStr.substring(7);
+                }
+                if (textStr.startsWith("```")) {
+                    textStr = textStr.substring(3);
+                }
+                if (textStr.endsWith("```")) {
+                    textStr = textStr.substring(0, textStr.length() - 3);
+                }
+                textStr = textStr.trim();
+                try {
+                    contentNode = objectMapper.readTree(textStr);
+                } catch (Exception ignored) {
+                }
+            } else if (rootNode.hasNonNull("response")) {
+                contentNode = rootNode.get("response");
+                contentNode = rootNode.get("output");
+            }
+
             String postId = rootNode.hasNonNull("postId") ? rootNode.get("postId").asText() : null;
             if (postId == null && rootNode.hasNonNull("requestId")) {
                 postId = rootNode.get("requestId").asText();
             }
+            if (postId == null && contentNode.hasNonNull("postId")) {
+                postId = contentNode.get("postId").asText();
+            }
+
+            // If postId is null from n8n but we have an active waiting request, match it!
+            if (postId == null && !pendingRequests.isEmpty()) {
+                postId = pendingRequests.keySet().iterator().next();
+                log.info("ℹ️ PostId was null in n8n response, auto-correlated with single active pending request: {}",
+                        postId);
+            }
+
             String authorId = rootNode.hasNonNull("authorId") ? rootNode.get("authorId").asText() : null;
+            if (authorId == null && contentNode.hasNonNull("authorId")) {
+                authorId = contentNode.get("authorId").asText();
+            }
             boolean success = rootNode.has("success") ? rootNode.get("success").asBoolean(true) : true;
 
             AiCaptionData aiData = null;
-            if (rootNode.has("ai")) {
-                JsonNode aiNode = rootNode.get("ai");
-                String caption = aiNode.hasNonNull("caption") ? aiNode.get("caption").asText() : "";
-                String category = aiNode.hasNonNull("category") ? aiNode.get("category").asText() : "";
-                String sentiment = aiNode.hasNonNull("sentiment") ? aiNode.get("sentiment").asText() : "";
+            JsonNode targetAiNode = contentNode.has("ai") ? contentNode.get("ai") : contentNode;
+
+            if (targetAiNode.hasNonNull("caption") || targetAiNode.hasNonNull("hashtags")) {
+                String caption = targetAiNode.hasNonNull("caption") ? targetAiNode.get("caption").asText() : "";
+                String category = targetAiNode.hasNonNull("category") ? targetAiNode.get("category").asText() : "";
+                String sentiment = targetAiNode.hasNonNull("sentiment") ? targetAiNode.get("sentiment").asText() : "";
 
                 List<String> hashtags = new ArrayList<>();
-                if (aiNode.has("hashtags") && aiNode.get("hashtags").isArray()) {
-                    aiNode.get("hashtags").forEach(h -> hashtags.add(h.asText()));
+                if (targetAiNode.has("hashtags") && targetAiNode.get("hashtags").isArray()) {
+                    targetAiNode.get("hashtags").forEach(h -> hashtags.add(h.asText()));
                 }
 
                 List<String> keywords = new ArrayList<>();
-                if (aiNode.has("keywords") && aiNode.get("keywords").isArray()) {
-                    aiNode.get("keywords").forEach(k -> keywords.add(k.asText()));
+                if (targetAiNode.has("keywords") && targetAiNode.get("keywords").isArray()) {
+                    targetAiNode.get("keywords").forEach(k -> keywords.add(k.asText()));
                 }
 
                 aiData = AiCaptionData.builder()
@@ -132,7 +175,9 @@ public class AiCaptionServiceImpl implements AiCaptionService {
                     log.info("✅ Successfully matched and completed AI request for postId: {}", postId);
                 }
             } else {
-                log.info("ℹ️ Received n8n response with postId: {}, but no active HTTP thread waiting (may have timed out or async).", postId);
+                log.info(
+                        "ℹ️ Received n8n response with postId: {}, but no active HTTP thread waiting (may have timed out or async).",
+                        postId);
             }
 
         } catch (Exception e) {
