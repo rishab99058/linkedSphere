@@ -21,6 +21,7 @@ COPY services/user-service/pom.xml services/user-service/
 COPY services/discovery-server/pom.xml services/discovery-server/
 COPY services/notification-service/pom.xml services/notification-service/
 COPY services/post-service/pom.xml services/post-service/
+COPY services/chat_service/pom.xml services/chat_service/
 
 # Download dependencies
 RUN --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline

@@ -21,6 +21,7 @@ COPY services/gateway-service/pom.xml services/gateway-service/
 COPY services/notification-service/pom.xml services/notification-service/
 COPY services/user-service/pom.xml services/user-service/
 COPY services/post-service/pom.xml services/post-service/
+COPY services/chat_service/pom.xml services/chat_service/
 
 # Download dependencies
 RUN --mount=type=cache,target=/root/.m2 \
