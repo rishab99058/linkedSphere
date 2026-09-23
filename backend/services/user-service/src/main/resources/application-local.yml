@@ -62,3 +62,16 @@ aws:
     bucket-name: linkedsphere-dev-media
     access-key: AKIA5G4TNWPL75SM525H
     secret-key: 32FTo1HLCg3rNnB1wDZX3iahpJ5BuBm6nP/o1T56o
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
