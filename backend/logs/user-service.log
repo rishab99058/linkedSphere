@@ -1,0 +1,78 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.5)
+
+2026-09-23T23:40:39.149+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] c.l.user_service.UserServiceApplication  : Starting UserServiceApplication v0.0.1-SNAPSHOT using Java 21.0.9 with PID 9172 (/Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere/backend/services/user-service/target/user-service-0.0.1-SNAPSHOT.jar started by saharshkumarshrivastav in /Users/saharshkumarshrivastav/Documents/GitHub/linkedSphere)
+2026-09-23T23:40:39.181+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] c.l.user_service.UserServiceApplication  : The following 1 profile is active: "local"
+2026-09-23T23:40:45.570+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-09-23T23:40:46.219+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 626 ms. Found 4 JPA repository interfaces.
+2026-09-23T23:40:47.444+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.s.cloud.context.scope.GenericScope     : BeanFactory id=9c149ce9-4596-3cba-bc97-ba06c388c734
+2026-09-23T23:40:49.819+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 7999 (http)
+2026-09-23T23:40:49.857+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-09-23T23:40:49.858+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.44]
+2026-09-23T23:40:49.927+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.a.c.c.C.[Tomcat].[localhost].[/users]  : Initializing Spring embedded WebApplicationContext
+2026-09-23T23:40:49.929+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 10475 ms
+2026-09-23T23:40:53.450+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-09-23T23:40:53.600+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.26.Final
+2026-09-23T23:40:53.668+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-09-23T23:40:54.270+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-09-23T23:40:54.326+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-09-23T23:40:56.492+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@e6fbf82
+2026-09-23T23:40:56.495+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-09-23T23:40:57.571+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.6
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-09-23T23:40:59.505+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-09-23T23:41:00.741+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-09-23T23:41:01.573+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-09-23T23:41:06.985+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.s.c.openfeign.FeignClientFactoryBean   : For 'auth-service' URL not provided. Will try picking an instance via load-balancing.
+2026-09-23T23:41:08.790+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.neo4j.driver.internal.DriverFactory    : Driver instance 699789145 created for server uri 'neo4j+s://7af93226.databases.neo4j.io'
+2026-09-23T23:41:10.016+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-09-23T23:41:10.120+05:30  WARN [user-service,,] 9172 --- [user-service] [           main] [                                                 ] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: c47062e7-f368-4323-8416-ca86bcb2f59d
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-09-23T23:41:10.159+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-09-23T23:41:10.469+05:30  WARN [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-09-23T23:41:10.469+05:30  WARN [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore Deferred [Mvc [pattern='/health'], Ant [pattern='/health']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-09-23T23:41:12.686+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestTemplate.
+2026-09-23T23:41:12.827+05:30  WARN [user-service,,] 9172 --- [user-service] [           main] [                                                 ] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2026-09-23T23:41:13.017+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2026-09-23T23:41:13.116+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : Initializing Eureka in region us-east-1
+2026-09-23T23:41:13.134+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-09-23T23:41:13.166+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : Disable delta property : false
+2026-09-23T23:41:13.166+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : Single vip registry refresh property : null
+2026-09-23T23:41:13.166+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : Force full registry fetch : false
+2026-09-23T23:41:13.166+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : Application is null : false
+2026-09-23T23:41:13.167+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : Registered Applications size is zero : true
+2026-09-23T23:41:13.167+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : Application version is -1: true
+2026-09-23T23:41:13.167+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : Getting all instance registry info from the eureka server
+2026-09-23T23:41:14.268+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : The response status is 200
+2026-09-23T23:41:14.272+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : Starting heartbeat executor: renew interval is: 30
+2026-09-23T23:41:14.276+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] c.n.discovery.InstanceInfoReplicator     : InstanceInfoReplicator onDemand update allowed rate per min is 4
+2026-09-23T23:41:14.279+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : Discovery Client initialized at timestamp 1790187074278 with initial instances count: 2
+2026-09-23T23:41:14.298+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.s.c.n.e.s.EurekaServiceRegistry        : Registering application USER-SERVICE with eureka with status UP
+2026-09-23T23:41:14.300+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1790187074300, current=UP, previous=STARTING]
+2026-09-23T23:41:14.305+05:30  INFO [user-service,,] 9172 --- [user-service] [foReplicator-%d] [                                                 ] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_USER-SERVICE/192.168.1.9:user-service:7999: registering service...
+2026-09-23T23:41:14.326+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 7999 (http) with context path '/users'
+2026-09-23T23:41:14.327+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] .s.c.n.e.s.EurekaAutoServiceRegistration : Updating port to 7999
+2026-09-23T23:41:14.379+05:30  INFO [user-service,,] 9172 --- [user-service] [           main] [                                                 ] c.l.user_service.UserServiceApplication  : Started UserServiceApplication in 38.037 seconds (process running for 40.413)
+2026-09-23T23:41:14.434+05:30  INFO [user-service,,] 9172 --- [user-service] [foReplicator-%d] [                                                 ] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_USER-SERVICE/192.168.1.9:user-service:7999 - registration status: 204
+2026-09-23T23:46:13.175+05:30  INFO [user-service,,] 9172 --- [user-service] [rap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-09-23T23:51:13.182+05:30  INFO [user-service,,] 9172 --- [user-service] [rap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-09-23T23:56:13.190+05:30  INFO [user-service,,] 9172 --- [user-service] [rap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-09-24T00:01:13.197+05:30  INFO [user-service,,] 9172 --- [user-service] [rap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-09-24T00:06:13.207+05:30  INFO [user-service,,] 9172 --- [user-service] [rap-executor-%d] [                                                 ] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
